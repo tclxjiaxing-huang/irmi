@@ -71,6 +71,12 @@ async function chooseSubOptions(filePath, options) {
       await init(filePath);
     } else if (result === 'noUpStream') {
       await execCMD.pushUpStream(filePath, 'dev');
+    } else if (result === 'timeOut') {
+      await (async () => {
+        const res = await execCMD[CMD](...param);
+        if (res === 'timeOut');
+        arguments.callee();
+      })();
     }
   }
 }

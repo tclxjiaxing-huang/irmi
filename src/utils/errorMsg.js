@@ -22,6 +22,10 @@ const errList = [{
   msg: 'The current branch dev has no upstream branch',
   desc: '当前分支没有与远程仓库建立连接!',
   value: 'noUpStream',
+}, {
+  msg: 'Timed out',
+  desc: '网络超时,真正重试!',
+  value: 'timeOut',
 }];
 
 function errorMsg(msg) {
