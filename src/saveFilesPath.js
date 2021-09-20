@@ -1,0 +1,63 @@
+const {
+  isFileExist,
+  red,
+  green,
+  gray,
+  yellowBright,
+  writeTempData,
+  readTempData,
+  tempFileName,
+} = require('./utils/utils');
+
+const filePathRegx = /^[A-Z]:(\\{1,2}[\w-]+)+$/
+
+function saveFile(filePath) {
+  if (!filePathRegx.test(filePath)) {
+    red('当前路径有误，需为项目根目录的绝对路径，请重新输入!');
+    return;
+  }
+  const fileList = filePath.split(',').map((file) => ({
+    name: file.split('\\')[file.split('\\').length - 1],
+    path: file,
+  }));
+  let fileData = JSON.parse(readTempData(tempFileName));
+  if (!fileData) {
+    fileData = [];
+  }
+  let isNew = false;
+  for (let i = 0; i < fileList.length; i += 1) {
+    if (fileData.length === 0) {
+      if (isFileExist(fileList[i].path)) {
+        fileData.push(fileList[i]);
+        isNew = true;
+      } else {
+        red(`${fileList[i].name}目录不存在!`);
+      }
+    } else {
+      for (let j = 0; j < fileData.length; j += 1) {
+        if (fileList[i].path === fileData[j].path) {
+          gray(`${fileList[i].path}项目已存在，跳过！`);
+          break;
+        } else if (j === fileData.length - 1) {
+          if (isFileExist(fileList[i].path)) {
+            fileData.push(fileList[i]);
+            isNew = true;
+          } else {
+            red(`${fileList[i].name}目录不存在!`);
+          }
+        }
+      }
+    }
+  }
+  if (fileData.length > 0) {
+    writeTempData(tempFileName, fileData);
+    isNew && green('***保存成功***');
+    green('***配置完成***');
+    green('--已有项目--');
+    for (let i = 0; i < fileData.length; i += 1) {
+      yellowBright(`${fileData[i].name}`);
+    }
+  }
+}
+
+module.exports = saveFile;
