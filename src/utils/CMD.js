@@ -16,7 +16,6 @@ async function CMD(path, execCode, tips = '') {
         errObj && yellow(`提示: ${errObj.desc}`);
         errObj && errObj.value && resolve(errObj.value);
         !errObj && red(`error: ${err}`);
-        red(`error: ${err}`);
         return;
       };
       tips && green(tips);
