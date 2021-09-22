@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+
 const { Command } = require('commander');
 const tag = require('../src/tag.js');
 const push = require('../src/push.js');
