@@ -24,7 +24,11 @@ const errList = [{
   value: 'noUpStream',
 }, {
   msg: 'Timed out',
-  desc: '网络超时,真正重试!',
+  desc: '网络超时,正在重试!',
+  value: 'timeOut',
+}, {
+  msg: 'Connection was reset',
+  desc: '网络超时,正在重试!',
   value: 'timeOut',
 }];
 
