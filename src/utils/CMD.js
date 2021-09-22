@@ -28,6 +28,7 @@ const remoteSet = async (path, url) => await CMD(path, `git remote origin set-ur
 const remoteDel = async (path) => await CMD(path, `git remote rm origin`, `已删除远程仓库地址`);
 const remoteAdd = async (path, url) => await CMD(path, `git remote add origin ${url}`, `已配置远程仓库地址`);
 const branch = async (path, branch = 'dev') => await CMD(path, `git branch ${branch}`, `已创建${branch}分支`);
+const status = async (path) => await CMD(path, `git status`);
 const init = async (path) => await CMD(path, 'git init', '已初始化');
 const add = async (path) => await CMD(path, 'git add .', '已添加到暂存区');
 const commit = async (path, msg = '提交') => await CMD(path, `git commit -m ${msg}`, '已添加到本地仓库');
@@ -53,6 +54,7 @@ const execCMD = {
   remoteAdd,
   remoteDel,
   remoteSet,
+  status,
 }
 
 module.exports = {

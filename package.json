@@ -1,10 +1,11 @@
 {
-  "name": "gat",
+  "name": "wkgit",
   "version": "1.0.0",
   "description": "一个简单的git项目管理工具",
   "main": "index.js",
   "bin": {
-    "gat": "dist/gat.js"
+    "irmi": "dist/gat.js",
+    "irmiDev": "bin/commander.js"
   },
   "dependencies": {
     "chalk": "^4.1.2",

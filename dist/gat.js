@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 
 var commander$1 = require('commander');
@@ -420,6 +421,10 @@ async function init(filePath) {
   await execCMD.branch(filePath, 'test');
   await execCMD.checkout(filePath, 'dev');
 }
+// 执行系列命令前，先切换到dev分支
+async function checkoutDev(filePath) {
+  await execCMD.checkout(filePath, 'dev2');
+}
 // 配置远程仓库地址
 async function setOrigin(filePath) {
   const { orginUrl } = await inquirer__default['default'].prompt([{
@@ -442,7 +447,7 @@ async function setOrigin(filePath) {
 async function chooseSubOptions(filePath, options) {
   const steps = options.split('-'); // 所有步骤
   const branchRegx = /^(.*)\((.*)\)$/; //带有分支的命令正则
-  console.log(steps);
+  let currentBranch = 'dev';
   for (let i = 0; i < steps.length; i += 1) {
     const isBranch = branchRegx.test(steps[i]); // 当前步骤是否有分支操作
     let CMD = steps[i]; // 统一命令方法
@@ -457,8 +462,11 @@ async function chooseSubOptions(filePath, options) {
       }]);
       param.push(commitMsg);
     }
-    isBranch && param.push(steps[i].match(branchRegx)[2]); // 如果是分支操作，则第二个参数为分支名称
-    isBranch && (CMD = steps[i].match(branchRegx)[1]); // 如果是分支操作，则匹配出分支操作的正确方法名
+    if (isBranch) {
+      currentBranch = steps[i].match(branchRegx)[2]; // 如果是分支操作，则第二个参数为分支名称
+      param.push(currentBranch);
+      CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名
+    }
     const result = await execCMD[CMD](...param);
     if (result === 'pull') {
       await execCMD.pull(...param);
@@ -527,6 +535,7 @@ async function chooseOptions() {
     }],
   }]);
   for (let i = 0; i < fileList.length; i += 1) {
+    await checkoutDev(fileList[i]);
     yellowBright$2(`***当前应用[${fileList[i]}]***`);
     await chooseSubOptions(fileList[i], options);
   }

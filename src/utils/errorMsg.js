@@ -30,6 +30,10 @@ const errList = [{
   msg: 'Connection was reset',
   desc: '网络超时,正在重试!',
   value: 'timeOut',
+}, {
+  msg: 'did not match any file(s) known to git',
+  desc: '分支不存在, 正在创建',
+  value: 'notMatchBranch',
 }];
 
 function errorMsg(msg) {
