@@ -27,6 +27,7 @@ async function chooseSubOptions(filePath, options) {
   for (let i = 0; i < steps.length; i += 1) {
     let currBranch = await getCurrBranch(); // 当前分支
     let targetBranch = currBranch; // 如果涉及到分支操作的目标分支
+    console.log(targetBranch);
     const isBranch = branchRegx.test(steps[i]); // 当前步骤是否有分支操作
     let CMD = steps[i]; // 统一命令方法
     const param = [filePath]; // 统一命令方法的参数 [文件路径, commit说明/分支]
@@ -59,7 +60,6 @@ async function chooseSubOptions(filePath, options) {
     } else if (result === 'init') {
       await init(filePath);
     } else if (result === 'noUpStream') {
-      console.log(targetBranch);
       await execCMD.pushUpStream(filePath, targetBranch);
     } else if (result === 'timeOut') {
       let num = 1;
