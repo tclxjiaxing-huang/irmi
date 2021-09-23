@@ -59,6 +59,7 @@ async function chooseSubOptions(filePath, options) {
     } else if (result === 'init') {
       await init(filePath);
     } else if (result === 'noUpStream') {
+      console.log(targetBranch);
       await execCMD.pushUpStream(filePath, targetBranch);
     } else if (result === 'timeOut') {
       let num = 1;

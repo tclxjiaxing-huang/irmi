@@ -19,7 +19,7 @@ const errList = [{
   desc: '远程仓库地址有误!',
   value: 'errorOriginUrl',
 }, {
-  msg: 'has no upstream branch',
+  msg: 'To push the current branch and set the remote as upstream',
   desc: '当前分支没有与远程仓库建立连接!',
   value: 'noUpStream',
 }, {
