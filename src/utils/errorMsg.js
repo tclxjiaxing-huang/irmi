@@ -38,6 +38,7 @@ const errList = [{
 
 function errorMsg(msg) {
   for (let i = 0; i < errList.length; i += 1) {
+    console.log(msg);
     if (msg.indexOf(errList[i].msg) !== -1) {
       return errList[i];
     }
