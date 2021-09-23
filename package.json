@@ -1,6 +1,6 @@
 {
   "name": "wkgit",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "一个简单的git项目管理工具",
   "main": "index.js",
   "bin": {

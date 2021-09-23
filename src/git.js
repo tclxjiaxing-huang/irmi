@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
-const tag = require('./tag.js');
-const push = require('./push.js');
+const tag = require('./command/tag/tag.js');
+const push = require('./command/push/push.js');
 
 // 选择操作
 async function chooseOptions() {

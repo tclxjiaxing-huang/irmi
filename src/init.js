@@ -1,3 +1,4 @@
+const inquirer = require('inquirer');
 const {
   execCMD,
   writeFile,

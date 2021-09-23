@@ -4,6 +4,7 @@ export default {
   input: 'bin/commander.js',
   output: {
     file: 'dist/gat.js',
+    banner: '#!/usr/bin/env node',
     format: 'cjs',
   },
   plugins: [

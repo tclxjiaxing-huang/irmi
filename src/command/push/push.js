@@ -1,13 +1,15 @@
 const inquirer = require('inquirer');
 const {
   execCMD,
+  red,
   yellowBright,
   readFilesPath,
-} = require('./utils/utils');
+} = require('../../utils/utils');
 const {
   init,
+  setOrigin,
   getCurrBranch,
-} = require('./init');
+} = require('../../init');
 
 // 执行系列命令前，先切换到dev分支
 async function checkoutDev(filePath) {
@@ -59,9 +61,15 @@ async function chooseSubOptions(filePath, options) {
     } else if (result === 'noUpStream') {
       await execCMD.pushUpStream(filePath, targetBranch);
     } else if (result === 'timeOut') {
+      let num = 1;
       await (async function reTry() {
         const res = await execCMD[CMD](...param);
         if (res === 'timeOut') {
+          num++;
+          if (num === 3) {
+            red('网络错误!');
+            return;
+          }
           await reTry();
         };
       })();

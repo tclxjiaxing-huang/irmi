@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 const { Command } = require('commander');
-const tag = require('../src/tag.js');
-const push = require('../src/push.js');
-const saveFile = require('../src/saveFilesPath');
+const tag = require('../src/command/tag/tag.js');
+const push = require('../src/command/push/push.js');
+const saveFile = require('../src/command/config/saveFilesPath');
 const {
   showProject,
   delProject,
-} = require('../src/project');
-const customStep = require('../src/customStep');
+} = require('../src/command/projects/project');
+const customStep = require('../src/command/customStep/customStep');
 
 const program = new Command();
 

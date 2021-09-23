@@ -2,7 +2,7 @@ const inquirer = require('inquirer');
 const {
   readTempData,
   writeTempData,
-} = require('../src/utils/utils')
+} = require('../../utils/utils')
 
 const tempStepFile = 'customStep.txt';
 

@@ -7,7 +7,7 @@ const {
   writeTempData,
   readTempData,
   tempFileName,
-} = require('./utils/utils');
+} = require('../../utils/utils');
 
 const filePathRegx = /^[A-Z]:(\\{1,2}[\w-]+)+$/
 

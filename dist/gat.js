@@ -29,12 +29,12 @@ const log = (colorLog) => {
 const yellow$4 = log(chalk__default['default'].yellow);
 const yellowBright$4 = log(chalk__default['default'].yellowBright);
 const green$3 = log(chalk__default['default'].green);
-const red$3 = log(chalk__default['default'].red);
+const red$4 = log(chalk__default['default'].red);
 const gray$1 = log(chalk__default['default'].gray);
 
 var log_1 = {
   gray: gray$1,
-  red: red$3,
+  red: red$4,
   green: green$3,
   yellow: yellow$4,
   yellowBright: yellowBright$4,
@@ -46,7 +46,7 @@ log_1.yellow;
 log_1.yellowBright;
 
 const {
-  red: red$2,
+  red: red$3,
   yellow: yellow$3,
 } = log_1;
 
@@ -116,7 +116,7 @@ const readFilesPath$3 = () => {
       name: file.name.split('\\')[file.name.split('\\').length - 1],
     }));
   } else {
-    red$2('暂无配置项目，请先执行config添加项目');
+    red$3('暂无配置项目，请先执行config添加项目');
     process.exit(0);
   }
 };
@@ -191,6 +191,10 @@ const errList = [{
   msg: 'Connection was reset',
   desc: '网络超时,正在重试!',
   value: 'timeOut',
+}, {
+  msg: 'did not match any file(s) known to git',
+  desc: '分支不存在, 正在创建',
+  value: 'notMatchBranch',
 }];
 
 function errorMsg(msg) {
@@ -207,7 +211,7 @@ var errorMsg_1 = errorMsg;
 const { exec } = child_process__default['default'];
 
 const {
-  red: red$1,
+  red: red$2,
   green: green$2,
   yellow: yellow$2,
 } = log_1;
@@ -221,7 +225,7 @@ async function CMD(path, execCode, tips = '') {
         const errObj = errorMsg_1(JSON.stringify(err.message));
         errObj && yellow$2(`提示: ${errObj.desc}`);
         errObj && errObj.value && resolve(errObj.value);
-        !errObj && red$1(`error: ${err}`);
+        !errObj && red$2(`error: ${err}`);
         return;
       }      tips && green$2(tips);
       resolve(stdout);
@@ -233,7 +237,8 @@ const remoteSet = async (path, url) => await CMD(path, `git remote origin set-ur
 const remoteDel = async (path) => await CMD(path, `git remote rm origin`, `已删除远程仓库地址`);
 const remoteAdd = async (path, url) => await CMD(path, `git remote add origin ${url}`, `已配置远程仓库地址`);
 const branch = async (path, branch = 'dev') => await CMD(path, `git branch ${branch}`, `已创建${branch}分支`);
-const init$1 = async (path) => await CMD(path, 'git init', '已初始化');
+const status = async (path) => await CMD(path, `git status`);
+const init$2 = async (path) => await CMD(path, 'git init', '已初始化');
 const add = async (path) => await CMD(path, 'git add .', '已添加到暂存区');
 const commit = async (path, msg = '提交') => await CMD(path, `git commit -m ${msg}`, '已添加到本地仓库');
 const push$1 = async (path) => await CMD(path, `git push`, '已推送到远程仓库');
@@ -243,7 +248,7 @@ const pull = async (path) => await CMD(path, `git pull`, '已从远程仓库拉�
 const checkout = async (path, branch = 'test') => await CMD(path, `git checkout ${branch}`, `已切换${branch}分支`);
 const merge = async (path, branch = 'dev') => await CMD(path, `git merge ${branch}`, `已与${branch}分支合并`);
 
-const execCMD$2 = {
+const execCMD$3 = {
   CMD,
   add,
   commit,
@@ -253,15 +258,16 @@ const execCMD$2 = {
   checkout,
   merge,
   pull,
-  init: init$1,
+  init: init$2,
   branch,
   remoteAdd,
   remoteDel,
   remoteSet,
+  status,
 };
 
 var CMD_1 = {
-  execCMD: execCMD$2,
+  execCMD: execCMD$3,
 };
 CMD_1.execCMD;
 
@@ -278,23 +284,23 @@ const {
   getDate,
   yellow: yellow$1,
   yellowBright: yellowBright$3,
-  execCMD: execCMD$1,
+  execCMD: execCMD$2,
   readFilesPath: readFilesPath$2,
 } = utils;
 
 // 获取已存在的tag
 async function getAlreadyTag(filePath) {
-  const result = await execCMD$1.CMD(filePath, 'git tag');
+  const result = await execCMD$2.CMD(filePath, 'git tag');
   const vList = result.split(/\n/);
   vList.pop();
   return vList;
 }
 
 // 标签命令
-const tag = (filePath, tagName, tagDesc) => execCMD$1.CMD(filePath, `git tag -a ${tagName} -m '${tagDesc}'`, `已打标签!(${tagName})`);
-const pushTag = (filePath) => execCMD$1.CMD(filePath, `git push origin --tags`, '已推送标签到仓库!');
-const delTag = (filePath, tagName) => execCMD$1.CMD(filePath, `git tag -d ${tagName}`, `已删除本地标签!(${tagName})`);
-const delOriginTag = (filePath, tagName) => execCMD$1.CMD(filePath, `git push origin :refs/tags/${tagName}`, `已删除远程标签!(${tagName})`);
+const tag = (filePath, tagName, tagDesc) => execCMD$2.CMD(filePath, `git tag -a ${tagName} -m '${tagDesc}'`, `已打标签!(${tagName})`);
+const pushTag = (filePath) => execCMD$2.CMD(filePath, `git push origin --tags`, '已推送标签到仓库!');
+const delTag = (filePath, tagName) => execCMD$2.CMD(filePath, `git tag -d ${tagName}`, `已删除本地标签!(${tagName})`);
+const delOriginTag = (filePath, tagName) => execCMD$2.CMD(filePath, `git push origin :refs/tags/${tagName}`, `已删除远程标签!(${tagName})`);
 const tagCMD = {
   tag,
   pushTag,
@@ -404,29 +410,33 @@ async function chooseSubOptions$1(filePath, options, specParams) {
 var tag_1 = chooseOptions$1;
 
 const {
-  execCMD,
-  yellowBright: yellowBright$2,
-  readFilesPath: readFilesPath$1,
+  execCMD: execCMD$1,
   writeFile,
   resolve,
 } = utils;
 
 // 初始化项目
-async function init(filePath) {
-  await execCMD.init(filePath);
+async function init$1(filePath) {
+  await execCMD$1.init(filePath);
   writeFile(resolve(filePath, '.gitignore'), 'node_modules\n');
-  await execCMD.add(filePath);
-  await execCMD.commit(filePath);
-  await execCMD.branch(filePath, 'dev');
-  await execCMD.branch(filePath, 'test');
-  await execCMD.checkout(filePath, 'dev');
+  await execCMD$1.add(filePath);
+  await execCMD$1.commit(filePath);
+  await execCMD$1.branch(filePath, 'dev');
+  await execCMD$1.branch(filePath, 'test');
+  await execCMD$1.checkout(filePath, 'dev');
 }
-// 执行系列命令前，先切换到dev分支
-async function checkoutDev(filePath) {
-  await execCMD.checkout(filePath, 'dev2');
+// 获取当前分支
+async function getCurrBranch$1(filePath) {
+  const result = await execCMD$1.status(filePath);
+  const regx = /^On branch (.*)/;
+  const res = result.match(regx);
+  if (res) {
+    return res[1];
+  }
+  return 'dev';
 }
 // 配置远程仓库地址
-async function setOrigin(filePath) {
+async function setOrigin$1(filePath) {
   const { orginUrl } = await inquirer__default['default'].prompt([{
     type: 'input',
     name: 'orginUrl',
@@ -436,19 +446,48 @@ async function setOrigin(filePath) {
       return true;
     },
   }]);
-  await execCMD.remoteAdd(filePath, orginUrl);
-  const res = await execCMD.pushOrigin(filePath, 'master');
+  await execCMD$1.remoteAdd(filePath, orginUrl);
+  const res = await execCMD$1.pushOrigin(filePath, 'master');
   if (res === 'errorOriginUrl') {
-    await execCMD.remoteDel(filePath);
-    await setOrigin(filePath);
+    await execCMD$1.remoteDel(filePath);
+    await setOrigin$1(filePath);
+  }
+}
+
+var init_1 = {
+  init: init$1,
+  getCurrBranch: getCurrBranch$1,
+  setOrigin: setOrigin$1,
+};
+
+const {
+  execCMD,
+  red: red$1,
+  yellowBright: yellowBright$2,
+  readFilesPath: readFilesPath$1,
+} = utils;
+const {
+  init,
+  setOrigin,
+  getCurrBranch,
+} = init_1;
+
+// 执行系列命令前，先切换到dev分支
+async function checkoutDev(filePath) {
+  const branch = 'dev';
+  const result = await execCMD.checkout(filePath, branch);
+  if (result === 'notMatchBranch') {
+    await execCMD.branch(filePath, branch);
+    await checkoutDev(filePath);
   }
 }
 
 async function chooseSubOptions(filePath, options) {
   const steps = options.split('-'); // 所有步骤
   const branchRegx = /^(.*)\((.*)\)$/; //带有分支的命令正则
-  let currentBranch = 'dev';
   for (let i = 0; i < steps.length; i += 1) {
+    let currBranch = await getCurrBranch(); // 当前分支
+    let targetBranch = currBranch; // 如果涉及到分支操作的目标分支
     const isBranch = branchRegx.test(steps[i]); // 当前步骤是否有分支操作
     let CMD = steps[i]; // 统一命令方法
     const param = [filePath]; // 统一命令方法的参数 [文件路径, commit说明/分支]
@@ -463,8 +502,8 @@ async function chooseSubOptions(filePath, options) {
       param.push(commitMsg);
     }
     if (isBranch) {
-      currentBranch = steps[i].match(branchRegx)[2]; // 如果是分支操作，则第二个参数为分支名称
-      param.push(currentBranch);
+      targetBranch = steps[i].match(branchRegx)[2]; // 如果是分支操作，则第二个参数为分支名称
+      param.push(targetBranch);
       CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名
     }
     const result = await execCMD[CMD](...param);
@@ -481,13 +520,22 @@ async function chooseSubOptions(filePath, options) {
     } else if (result === 'init') {
       await init(filePath);
     } else if (result === 'noUpStream') {
-      await execCMD.pushUpStream(filePath, 'dev');
+      await execCMD.pushUpStream(filePath, targetBranch);
     } else if (result === 'timeOut') {
+      let num = 1;
       await (async function reTry() {
         const res = await execCMD[CMD](...param);
         if (res === 'timeOut') {
+          num++;
+          if (num === 3) {
+            red$1('网络错误!');
+            return;
+          }
           await reTry();
         }      })();
+    } else if (result === 'notMatchBranch') {
+      await execCMD.branch(filePath, targetBranch);
+      await execCMD[CMD](...param);
     }
   }
 }

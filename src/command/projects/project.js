@@ -5,7 +5,7 @@ const {
   green,
   tempFileName,
   writeTempData,
-} = require('./utils/utils');
+} = require('../../utils/utils');
 const inquirer = require('inquirer');
 
 function showProject() {

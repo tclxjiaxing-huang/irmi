@@ -5,7 +5,7 @@ const {
   yellowBright,
   execCMD,
   readFilesPath,
-} = require('./utils/utils');
+} = require('../../utils/utils');
 
 // 获取已存在的tag
 async function getAlreadyTag(filePath) {
