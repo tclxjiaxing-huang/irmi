@@ -22,6 +22,7 @@ async function delPush() {
         if (push[i].value === stepList[j]) {
           push.splice(i, 1);
           i--;
+          break;
         }
       }
     }

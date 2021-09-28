@@ -95,7 +95,11 @@ async function pushStep() {
       stepName = pushStepList[stepTag].name;
     }
     if (stepTag === 'finish') {
-      isFinsh = true;
+      if (stepList.length === 0) {
+        yellow('至少包含一个步骤');
+      } else {
+        isFinsh = true;
+      }
     } else {
       stepList.push({
         name: stepName,
