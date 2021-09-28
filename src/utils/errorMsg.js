@@ -34,6 +34,10 @@ const errList = [{
   msg: 'did not match any file(s) known to git',
   desc: '分支不存在, 正在创建',
   value: 'notMatchBranch',
+}, {
+  msg: 'Please commit your changes or stash them before you switch branches',
+  desc: '当前分支有代码未提交，正在提交',
+  value: 'notCommitCode',
 }];
 
 function errorMsg(msg) {

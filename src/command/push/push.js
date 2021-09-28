@@ -90,6 +90,10 @@ async function chooseSubOptions(filePath, options) {
     } else if (result === 'notMatchBranch') {
       await execCMD.branch(filePath, targetBranch);
       await execCMD[CMD](...param);
+    } else if (result === 'notCommitCode') {
+      await execCMD.add(filePath);
+      await execCMD.commit(filePath);
+      await execCMD[CMD](...param);
     }
   }
 }
