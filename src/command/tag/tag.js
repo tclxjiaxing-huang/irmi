@@ -81,6 +81,16 @@ async function getDelParams(vList) {
 // 选择操作
 async function chooseOptions() {
   const filesData = readFilesPath();
+  const choices = filesData.map((file) => ({
+    name: file.name,
+    value: file.path,
+  }));
+  let { filesList } = await inquirer.prompt([{
+    type: 'checkbox',
+    name: 'filesList',
+    message: '选择应用(不选择则全部应用)',
+    choices: choices,
+  }]);
   const { options } = await inquirer.prompt([{
     type: 'list',
     name: 'options',
@@ -107,16 +117,6 @@ async function chooseOptions() {
       name: '展示所有项目的标签',
       value: 'showAllTag',
     }],
-  }]);
-  const choices = filesData.map((file) => ({
-    name: file.name,
-    value: file.path,
-  }));
-  let { filesList } = await inquirer.prompt([{
-    type: 'checkbox',
-    name: 'filesList',
-    message: '选择应用(不选择则全部应用)',
-    choices: choices,
   }]);
   if (!filesList) {
     filesList = filesData;

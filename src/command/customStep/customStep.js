@@ -8,7 +8,6 @@ const {
 } = require('../../utils/utils');
 const delStep = require('./delStep');
 
-
 // 推送步骤
 const pushStepList = {
   add: {

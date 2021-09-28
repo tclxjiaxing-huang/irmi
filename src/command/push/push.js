@@ -113,25 +113,24 @@ async function chooseOptions() {
     value: file.path,
   }));
   const customStep = await getCustomStep();
-  const { fileList } = await inquirer.prompt([{
+  let { filesList } = await inquirer.prompt([{
     type: 'checkbox',
-    name: 'fileList',
-    message: '选择应用',
+    name: 'filesList',
+    message: '选择应用(不选择则全部应用)',
     choices: choices,
-    validate: (res) => {
-      if (res.length > 0) return true;
-      return '必须选择至少一个项目!';
-    },
   }]);
+  if (!filesList) {
+    filesList = filesData;
+  }
   const { options } = await inquirer.prompt([{
     type: 'list',
     name: 'options',
     choices: defaultStep.concat(customStep),
   }]);
-  for (let i = 0; i < fileList.length; i += 1) {
-    await checkoutDev(fileList[i]);
-    yellowBright(`***当前应用[${fileList[i]}]***`);
-    await chooseSubOptions(fileList[i], options);
+  for (let i = 0; i < filesList.length; i += 1) {
+    await checkoutDev(filesList[i]);
+    yellowBright(`***当前应用[${filesList[i]}]***`);
+    await chooseSubOptions(filesList[i], options);
   }
 }
 

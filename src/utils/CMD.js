@@ -6,7 +6,7 @@ const {
   yellow,
 } = require('./log');
 
-async function CMD(path, execCode, tips = '') {
+async function CMD(path, execCode, tips = '', isLog = false) {
   return new Promise((resolve) => {
     exec(execCode, {
       cwd: path,
@@ -19,16 +19,17 @@ async function CMD(path, execCode, tips = '') {
         return;
       };
       tips && green(tips);
+      isLog && yellow(stdout);
       resolve(stdout);
     });
-  })
+  });
 }
 
 const remoteSet = async (path, url) => await CMD(path, `git remote origin set-url ${url}`, `已修改远程仓库地址`);
 const remoteDel = async (path) => await CMD(path, `git remote rm origin`, `已删除远程仓库地址`);
 const remoteAdd = async (path, url) => await CMD(path, `git remote add origin ${url}`, `已配置远程仓库地址`);
 const branch = async (path, branch = 'dev') => await CMD(path, `git branch ${branch}`, `已创建${branch}分支`);
-const status = async (path) => await CMD(path, `git status`);
+const status = async (path) => await CMD(path, `git status`, '');
 const init = async (path) => await CMD(path, 'git init', '已初始化');
 const add = async (path) => await CMD(path, 'git add .', '已添加到暂存区');
 const commit = async (path, msg = '提交') => await CMD(path, `git commit -m ${msg}`, '已添加到本地仓库');
