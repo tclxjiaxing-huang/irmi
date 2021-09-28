@@ -26,17 +26,17 @@ function createCommonjsModule(fn, module) {
 const log = (colorLog) => {
   return (...rest) => console.log(colorLog(...rest));
 };
-const yellow$4 = log(chalk__default['default'].yellow);
+const yellow$5 = log(chalk__default['default'].yellow);
 const yellowBright$4 = log(chalk__default['default'].yellowBright);
-const green$3 = log(chalk__default['default'].green);
-const red$4 = log(chalk__default['default'].red);
+const green$5 = log(chalk__default['default'].green);
+const red$5 = log(chalk__default['default'].red);
 const gray$1 = log(chalk__default['default'].gray);
 
 var log_1 = {
   gray: gray$1,
-  red: red$4,
-  green: green$3,
-  yellow: yellow$4,
+  red: red$5,
+  green: green$5,
+  yellow: yellow$5,
   yellowBright: yellowBright$4,
 };
 log_1.gray;
@@ -46,12 +46,13 @@ log_1.yellow;
 log_1.yellowBright;
 
 const {
-  red: red$3,
-  yellow: yellow$3,
+  red: red$4,
+  yellow: yellow$4,
 } = log_1;
 
 const tempDirName = 'gat';
 const tempFileName$2 = 'projectsPath.txt';
+const tempStepFile$3 = 'customStep.txt';
 
 // 查询文件是否存在
 const isFileExist$1 = (file) => {
@@ -76,7 +77,7 @@ const readFile = (path) => {
 };
 
 // 向暂存目录中保存数据
-const writeTempData$2 = (fileName, data) => {
+const writeTempData$4 = (fileName, data) => {
   const tempDir = resolve$1(os__default['default'].tmpdir(), tempDirName);
   // 判断暂存目录中是否有缓存目录
   const isExistTempDir = isFileExist$1(tempDir);
@@ -88,7 +89,7 @@ const writeTempData$2 = (fileName, data) => {
   writeFile$1(tempFile, JSON.stringify(data));
 };
 // 读取暂存目录中的文件数据
-const readTempData$1 = (fileName) => {
+const readTempData$4 = (fileName) => {
   const tempDir = resolve$1(os__default['default'].tmpdir(), tempDirName);
   const tempFile = resolve$1(tempDir, fileName);
   if (isFileExist$1(tempFile)) {
@@ -108,7 +109,7 @@ const readFilesPath$3 = () => {
   if (isFileExist$1(tempFile)) {
     const fileData = JSON.parse(readFile(tempFile));
     if (fileData.length === 0) {
-      yellow$3('暂无项目，请先添加');
+      yellow$4('暂无项目，请先添加');
       process.exit(0);
     }
     return fileData.map((file) => ({
@@ -116,7 +117,7 @@ const readFilesPath$3 = () => {
       name: file.name.split('\\')[file.name.split('\\').length - 1],
     }));
   } else {
-    red$3('暂无配置项目，请先执行config添加项目');
+    red$4('暂无配置项目，请先执行config添加项目');
     process.exit(0);
   }
 };
@@ -130,8 +131,9 @@ var files = {
   resolve: resolve$1,
   readFilesPath: readFilesPath$3,
   tempFileName: tempFileName$2,
-  writeTempData: writeTempData$2,
-  readTempData: readTempData$1,
+  tempStepFile: tempStepFile$3,
+  writeTempData: writeTempData$4,
+  readTempData: readTempData$4,
 };
 files.tempDirName;
 files.isFileExist;
@@ -141,6 +143,7 @@ files.readFile;
 files.resolve;
 files.readFilesPath;
 files.tempFileName;
+files.tempStepFile;
 files.writeTempData;
 files.readTempData;
 
@@ -180,7 +183,7 @@ const errList = [{
   desc: '远程仓库地址有误!',
   value: 'errorOriginUrl',
 }, {
-  msg: 'The current branch dev has no upstream branch',
+  msg: 'To push the current branch and set the remote as upstream',
   desc: '当前分支没有与远程仓库建立连接!',
   value: 'noUpStream',
 }, {
@@ -211,9 +214,9 @@ var errorMsg_1 = errorMsg;
 const { exec } = child_process__default['default'];
 
 const {
-  red: red$2,
-  green: green$2,
-  yellow: yellow$2,
+  red: red$3,
+  green: green$4,
+  yellow: yellow$3,
 } = log_1;
 
 async function CMD(path, execCode, tips = '') {
@@ -223,11 +226,11 @@ async function CMD(path, execCode, tips = '') {
     }, (err, stdout) => {
       if (err) {
         const errObj = errorMsg_1(JSON.stringify(err.message));
-        errObj && yellow$2(`提示: ${errObj.desc}`);
+        errObj && yellow$3(`提示: ${errObj.desc}`);
         errObj && errObj.value && resolve(errObj.value);
-        !errObj && red$2(`error: ${err}`);
+        !errObj && red$3(`error: ${err}`);
         return;
-      }      tips && green$2(tips);
+      }      tips && green$4(tips);
       resolve(stdout);
     });
   })
@@ -282,7 +285,7 @@ var utils = createCommonjsModule(function (module, exports) {
 
 const {
   getDate,
-  yellow: yellow$1,
+  yellow: yellow$2,
   yellowBright: yellowBright$3,
   execCMD: execCMD$2,
   readFilesPath: readFilesPath$2,
@@ -312,7 +315,7 @@ const tagCMD = {
 async function showAllTag(filesData) {
   for (let i = 0; i < filesData.length; i += 1) {
     const vList = await getAlreadyTag(filesData[i].path);
-    yellow$1(filesData[i].name);
+    yellow$2(filesData[i].name);
     yellowBright$3(vList.join('\n'));
   }
 }
@@ -462,15 +465,29 @@ var init_1 = {
 
 const {
   execCMD,
-  red: red$1,
+  red: red$2,
   yellowBright: yellowBright$2,
   readFilesPath: readFilesPath$1,
+  readTempData: readTempData$3,
+  tempStepFile: tempStepFile$2,
 } = utils;
 const {
   init,
   setOrigin,
   getCurrBranch,
 } = init_1;
+
+// 默认步骤
+const defaultStep = [{
+  name: '提交代码',
+  value: 'add-commit',
+}, {
+  name: '提交代码->推送',
+  value: 'add-commit-push',
+},  {
+  name: '提交代码->推送->合并到test->推送',
+  value: 'add-commit-push-checkout(test)-merge(dev)-push-checkout(dev)',
+}];
 
 // 执行系列命令前，先切换到dev分支
 async function checkoutDev(filePath) {
@@ -528,7 +545,7 @@ async function chooseSubOptions(filePath, options) {
         if (res === 'timeOut') {
           num++;
           if (num === 3) {
-            red$1('网络错误!');
+            red$2('网络错误!');
             return;
           }
           await reTry();
@@ -540,12 +557,21 @@ async function chooseSubOptions(filePath, options) {
   }
 }
 
+// 读取缓存中的自定义步骤
+async function getCustomStep() {
+  const res = await JSON.parse(readTempData$3(tempStepFile$2));
+  if (res && res.push) {
+    return res.push;
+  }
+  return [];
+}
 async function chooseOptions() {
   const filesData = readFilesPath$1();
   const choices = filesData.map((file) => ({
     name: file.name,
     value: file.path,
   }));
+  const customStep = await getCustomStep();
   const { fileList } = await inquirer__default['default'].prompt([{
     type: 'checkbox',
     name: 'fileList',
@@ -559,28 +585,7 @@ async function chooseOptions() {
   const { options } = await inquirer__default['default'].prompt([{
     type: 'list',
     name: 'options',
-    choices: [{
-      name: '提交代码',
-      value: 'add-commit',
-    }, {
-      name: '提交代码->推送',
-      value: 'add-commit-push',
-    }, {
-      name: '合并到test',
-      value: 'checkout(test)-merge(dev)-checkout(dev)',
-    }, {
-      name: '提交代码->合并到test',
-      value: 'add-commit-checkout(test)-merge(dev)-checkout(dev)',
-    }, {
-      name: '提交代码->推送->合并到test->推送',
-      value: 'add-commit-push-checkout(test)-merge(dev)-push-checkout(dev)',
-    }, {
-      name: '合并到master',
-      value: 'checkout(master)-merge(dev)-checkout(dev)',
-    }, {
-      name: '合并到master->推送',
-      value: 'checkout(master)-merge(dev)-push-checkout(dev)',
-    }],
+    choices: defaultStep.concat(customStep),
   }]);
   for (let i = 0; i < fileList.length; i += 1) {
     await checkoutDev(fileList[i]);
@@ -593,12 +598,12 @@ var push = chooseOptions;
 
 const {
   isFileExist,
-  red,
-  green: green$1,
+  red: red$1,
+  green: green$3,
   gray,
   yellowBright: yellowBright$1,
-  writeTempData: writeTempData$1,
-  readTempData,
+  writeTempData: writeTempData$3,
+  readTempData: readTempData$2,
   tempFileName: tempFileName$1,
 } = utils;
 
@@ -606,14 +611,14 @@ const filePathRegx = /^[A-Z]:(\\{1,2}[\w-]+)+$/;
 
 function saveFile(filePath) {
   if (!filePathRegx.test(filePath)) {
-    red('当前路径有误，需为项目根目录的绝对路径，请重新输入!');
+    red$1('当前路径有误，需为项目根目录的绝对路径，请重新输入!');
     return;
   }
   const fileList = filePath.split(',').map((file) => ({
     name: file.split('\\')[file.split('\\').length - 1],
     path: file,
   }));
-  let fileData = JSON.parse(readTempData(tempFileName$1));
+  let fileData = JSON.parse(readTempData$2(tempFileName$1));
   if (!fileData) {
     fileData = [];
   }
@@ -624,7 +629,7 @@ function saveFile(filePath) {
         fileData.push(fileList[i]);
         isNew = true;
       } else {
-        red(`${fileList[i].name}目录不存在!`);
+        red$1(`${fileList[i].name}目录不存在!`);
       }
     } else {
       for (let j = 0; j < fileData.length; j += 1) {
@@ -636,17 +641,17 @@ function saveFile(filePath) {
             fileData.push(fileList[i]);
             isNew = true;
           } else {
-            red(`${fileList[i].name}目录不存在!`);
+            red$1(`${fileList[i].name}目录不存在!`);
           }
         }
       }
     }
   }
   if (fileData.length > 0) {
-    writeTempData$1(tempFileName$1, fileData);
-    isNew && green$1('***保存成功***');
-    green$1('***配置完成***');
-    green$1('--已有项目--');
+    writeTempData$3(tempFileName$1, fileData);
+    isNew && green$3('***保存成功***');
+    green$3('***配置完成***');
+    green$3('--已有项目--');
     for (let i = 0; i < fileData.length; i += 1) {
       yellowBright$1(`${fileData[i].name}`);
     }
@@ -657,17 +662,17 @@ var saveFilesPath = saveFile;
 
 const {
   readFilesPath,
-  yellow,
+  yellow: yellow$1,
   yellowBright,
-  green,
+  green: green$2,
   tempFileName,
-  writeTempData,
+  writeTempData: writeTempData$2,
 } = utils;
 
 
 function showProject$1() {
   const filesData = readFilesPath();
-  yellow('***当前项目***');
+  yellow$1('***当前项目***');
   for (let i = 0; i < filesData.length; i += 1) {
     yellowBright(`${filesData[i].name}`);
   }
@@ -686,9 +691,9 @@ async function delProject$1() {
   }]);
   for (let i = 0; i < filesData.length; i += 1) {
     if (filesData[i].path === project) {
-      green(`${filesData[i].name}删除成功`);
+      green$2(`${filesData[i].name}删除成功`);
       filesData.splice(i, 1);
-      writeTempData(tempFileName, filesData);
+      writeTempData$2(tempFileName, filesData);
       return;
     }
   }
@@ -698,6 +703,200 @@ var project = {
   showProject: showProject$1,
   delProject: delProject$1,
 };
+
+const {
+  readTempData: readTempData$1,
+  writeTempData: writeTempData$1,
+  tempStepFile: tempStepFile$1,
+  red,
+  green: green$1,
+} = utils;
+
+async function delPush() {
+  const step = await JSON.parse(readTempData$1(tempStepFile$1));
+  if (step && Array.isArray(step.push) && step.push.length > 0) {
+    const { push } = step;
+    const { stepList } = await inquirer__default['default'].prompt([{
+      type: 'checkbox',
+      name: 'stepList',
+      message: '选择推送步骤',
+      choices: push,
+    }]);
+    for (let i = 0; i < push.length; i += 1) {
+      for (let j = 0; j < stepList.length; j += 1) {
+        if (push[i].value === stepList[j]) {
+          push.splice(i, 1);
+          i--;
+        }
+      }
+    }
+    step.push = push;
+    await writeTempData$1(tempStepFile$1, step);
+    green$1('***删除步骤成功***');
+  } else {
+    red('暂无自定义的推送步骤');
+  }
+}
+
+async function delStep() {
+  const { type } = await inquirer__default['default'].prompt([{
+    type: 'list',
+    name: 'type',
+    choices: [{
+      name: '推送步骤',
+      value: 'push'
+    }, {
+      name: '打标签步骤',
+      value: 'tag'
+    }],
+  }]);
+  if (type === 'push') {
+    await delPush();
+  }
+}
+
+var delStep_1 = delStep;
+
+const {
+  readTempData,
+  writeTempData,
+  tempStepFile,
+  green,
+  yellow,
+} = utils;
+
+
+
+// 推送步骤
+const pushStepList = {
+  add: {
+    name: '添加代码到暂存区(add)',
+    value: 'add',
+  },
+  commit: {
+    name: '添加代码到本地仓库(commit)',
+    value: 'commit',
+  },
+  push: {
+    name: '推送代码到远程仓库(push)',
+    value: 'push',
+  },
+  checkout: {
+    name: '切换分支(checkout)',
+    value: 'checkout(branchName)',
+    prompt: [{
+      type: 'input',
+      name: 'branchName',
+      message: '请输入切换的分支名称',
+    }],
+  },
+  merge: {
+    name: '合并分支(merge)',
+    value: 'merge(branchName)',
+    prompt: [{
+      type: 'input',
+      name: 'branchName',
+      message: '请输入目标分支名称',
+    }],
+  },
+  pull: {
+    name: '拉取代码(pull)',
+    value: 'pull',
+  },
+  finish: {
+    name: '完成',
+    value: 'finish',
+    prompt: null,
+  },
+};
+
+async function saveStep(data, type) {
+  let stepData = JSON.parse(readTempData(tempStepFile));
+  if (!stepData) {
+    stepData = {
+      push: [],
+      tag: [],
+    };
+  }
+  if (type === 'push') {
+    stepData['push'].push(data);
+  }
+  writeTempData(tempStepFile, stepData);
+  yellow(data.value);
+  green('***推送步骤保存成功***');
+}
+
+async function pushStep() {
+  let isFinsh = false;
+  const subStepRegx = /^(.*)\((.*)\)$/;
+  const stepList = [];
+  while (!isFinsh) {
+    let { stepTag } = await inquirer__default['default'].prompt([{
+      type: 'list',
+      name: 'stepTag',
+      choices: Object.keys(pushStepList).map((step) => ({
+        name: pushStepList[step].name,
+        value: pushStepList[step].value,
+      })),
+    }]);
+    let stepName = '';
+    let stepValue = stepTag;
+    // 判断是否有追加选项
+    const subStep = stepTag.match(subStepRegx);
+    if (subStep) {
+      stepValue = stepTag = subStep[1];
+      stepName = pushStepList[stepTag].name.replace(/\(.*\)/, '');
+      const answer = await inquirer__default['default'].prompt(pushStepList[stepTag].prompt);
+      stepValue += `(${answer[subStep[2]]})`;
+      stepName += `(${answer[subStep[2]]})`;
+    } else {
+      stepName = pushStepList[stepTag].name;
+    }
+    if (stepTag === 'finish') {
+      isFinsh = true;
+    } else {
+      stepList.push({
+        name: stepName,
+        value: stepValue,
+      });
+    }
+  }
+  const stepPrompt = {
+    name: [],
+    value: [],
+  };
+  stepList.forEach((step) => {
+    stepPrompt.name.push(step.name);
+    stepPrompt.value.push(step.value);
+  });
+  stepPrompt.name = stepPrompt.name.join('->');
+  stepPrompt.value = stepPrompt.value.join('-');
+  await saveStep(stepPrompt, 'push');
+}
+
+async function customStep() {
+  const { stepType } = await inquirer__default['default'].prompt([{
+    type: 'list',
+    name: 'stepType',
+    choices: [{
+      name: '推送步骤',
+      value: 'push'
+    }, {
+      name: '打标签步骤',
+      value: 'tag',
+    }, {
+      name: '删除步骤',
+      value: 'del',
+    }]
+  }]);
+  if (stepType === 'push') {
+    await pushStep();
+  } else if (stepType === 'tag') ; else if (stepType === 'del') {
+    await delStep_1();
+  }
+}
+
+var customStep_1 = customStep;
 
 const { Command } = commander__default['default'];
 
@@ -748,12 +947,12 @@ program
     await delProject();
   });
 
-// program
-//   .command('customStep')
-//   .description('自定义步骤')
-//   .action(async () => {
-//     await customStep();
-//   });
+program
+  .command('customStep')
+  .description('自定义步骤')
+  .action(async () => {
+    await customStep_1();
+  });
 
 program.parse(process.argv);
 

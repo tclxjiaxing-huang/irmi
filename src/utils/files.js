@@ -8,6 +8,7 @@ const {
 
 const tempDirName = 'gat';
 const tempFileName = 'projectsPath.txt';
+const tempStepFile = 'customStep.txt';
 
 // 查询文件是否存在
 const isFileExist = (file) => {
@@ -86,6 +87,7 @@ module.exports = {
   resolve,
   readFilesPath,
   tempFileName,
+  tempStepFile,
   writeTempData,
   readTempData,
 }

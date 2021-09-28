@@ -4,12 +4,26 @@ const {
   red,
   yellowBright,
   readFilesPath,
+  readTempData,
+  tempStepFile,
 } = require('../../utils/utils');
 const {
   init,
   setOrigin,
   getCurrBranch,
 } = require('../../init');
+
+// 默认步骤
+const defaultStep = [{
+  name: '提交代码',
+  value: 'add-commit',
+}, {
+  name: '提交代码->推送',
+  value: 'add-commit-push',
+},  {
+  name: '提交代码->推送->合并到test->推送',
+  value: 'add-commit-push-checkout(test)-merge(dev)-push-checkout(dev)',
+}];
 
 // 执行系列命令前，先切换到dev分支
 async function checkoutDev(filePath) {
@@ -80,12 +94,21 @@ async function chooseSubOptions(filePath, options) {
   }
 }
 
+// 读取缓存中的自定义步骤
+async function getCustomStep() {
+  const res = await JSON.parse(readTempData(tempStepFile));
+  if (res && res.push) {
+    return res.push;
+  }
+  return [];
+}
 async function chooseOptions() {
   const filesData = readFilesPath();
   const choices = filesData.map((file) => ({
     name: file.name,
     value: file.path,
   }));
+  const customStep = await getCustomStep();
   const { fileList } = await inquirer.prompt([{
     type: 'checkbox',
     name: 'fileList',
@@ -99,28 +122,7 @@ async function chooseOptions() {
   const { options } = await inquirer.prompt([{
     type: 'list',
     name: 'options',
-    choices: [{
-      name: '提交代码',
-      value: 'add-commit',
-    }, {
-      name: '提交代码->推送',
-      value: 'add-commit-push',
-    }, {
-      name: '合并到test',
-      value: 'checkout(test)-merge(dev)-checkout(dev)',
-    }, {
-      name: '提交代码->合并到test',
-      value: 'add-commit-checkout(test)-merge(dev)-checkout(dev)',
-    }, {
-      name: '提交代码->推送->合并到test->推送',
-      value: 'add-commit-push-checkout(test)-merge(dev)-push-checkout(dev)',
-    }, {
-      name: '合并到master',
-      value: 'checkout(master)-merge(dev)-checkout(dev)',
-    }, {
-      name: '合并到master->推送',
-      value: 'checkout(master)-merge(dev)-push-checkout(dev)',
-    }],
+    choices: defaultStep.concat(customStep),
   }]);
   for (let i = 0; i < fileList.length; i += 1) {
     await checkoutDev(fileList[i]);

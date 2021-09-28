@@ -49,11 +49,11 @@ program
     await delProject();
   });
 
-// program
-//   .command('customStep')
-//   .description('自定义步骤')
-//   .action(async () => {
-//     await customStep();
-//   });
+program
+  .command('customStep')
+  .description('自定义步骤')
+  .action(async () => {
+    await customStep();
+  });
 
 program.parse(process.argv);

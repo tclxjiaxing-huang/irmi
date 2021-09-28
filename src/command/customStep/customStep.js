@@ -2,9 +2,12 @@ const inquirer = require('inquirer');
 const {
   readTempData,
   writeTempData,
-} = require('../../utils/utils')
+  tempStepFile,
+  green,
+  yellow,
+} = require('../../utils/utils');
+const delStep = require('./delStep');
 
-const tempStepFile = 'customStep.txt';
 
 // 推送步骤
 const pushStepList = {
@@ -56,12 +59,13 @@ async function saveStep(data, type) {
       push: [],
       tag: [],
     };
-    writeTempData(tempStepFile, stepData);
   }
   if (type === 'push') {
     stepData['push'].push(data);
   }
   writeTempData(tempStepFile, stepData);
+  yellow(data.value);
+  green('***推送步骤保存成功***');
 }
 
 async function pushStep() {
@@ -86,7 +90,7 @@ async function pushStep() {
       stepName = pushStepList[stepTag].name.replace(/\(.*\)/, '');
       const answer = await inquirer.prompt(pushStepList[stepTag].prompt);
       stepValue += `(${answer[subStep[2]]})`;
-      stepName += `(${answer[subStep[2]]})`
+      stepName += `(${answer[subStep[2]]})`;
     } else {
       stepName = pushStepList[stepTag].name;
     }
@@ -109,7 +113,6 @@ async function pushStep() {
   });
   stepPrompt.name = stepPrompt.name.join('->');
   stepPrompt.value = stepPrompt.value.join('-');
-  console.log(stepPrompt);
   await saveStep(stepPrompt, 'push');
 }
 
@@ -123,12 +126,17 @@ async function customStep() {
     }, {
       name: '打标签步骤',
       value: 'tag',
+    }, {
+      name: '删除步骤',
+      value: 'del',
     }]
   }]);
   if (stepType === 'push') {
     await pushStep();
   } else if (stepType === 'tag') {
 
+  } else if (stepType === 'del') {
+    await delStep();
   }
 }
 
