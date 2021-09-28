@@ -91,7 +91,6 @@ async function chooseSubOptions(filePath, options) {
       await execCMD.branch(filePath, targetBranch);
       await execCMD[CMD](...param);
     } else if (result === 'notCommitCode') {
-      console.log(1);
       await execCMD.add(filePath);
       await execCMD.commit(filePath);
       await execCMD[CMD](...param);
