@@ -80,11 +80,13 @@ async function chooseSubOptions(filePath, options) {
         const res = await execCMD[CMD](...param);
         if (res === 'timeOut') {
           num++;
-          if (num === 3) {
+          if (num >= 3) {
             red('网络错误!');
+            process.exit(0);
             return;
+          } else {
+            await reTry();
           }
-          await reTry();
         };
       })();
     } else if (result === 'notMatchBranch') {
