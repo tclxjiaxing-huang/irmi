@@ -44,17 +44,18 @@ async function noUpStream(params, filePath, targetBranch) {
 async function timeOut(params, filePath, targetBranch, CMD) {
   let num = 1;
   await (async function reTry() {
-    const res = await execCMD[CMD](...params);
-    if (res === 'timeOut') {
-      num++;
-      if (num >= 3) {
-        red('网络错误!');
-        process.exit(0);
-        return;
-      } else {
-        await reTry();
-      }
-    };
+    await execCMD[CMD](...params).catch(async (errObj) => {
+      if (errObj.value === 'timeOut') {
+        num++;
+        if (num >= 3) {
+          red('网络错误!');
+          process.exit(0);
+          return;
+        } else {
+          await reTry();
+        }
+      };
+    });
   })();
 }
 // 沒有对应的分支名称
