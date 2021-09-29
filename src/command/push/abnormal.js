@@ -62,7 +62,6 @@ async function timeOut(params, filePath, targetBranch, CMD) {
 // 沒有对应的分支名称
 async function notMatchBranch(params, filePath, targetBranch) {
   // 询问是否创建对应的分支
-  console.log(1);
   const { isConfirm } = await inquirer.prompt([{
     type: 'confirm',
     message: `是否创建${targetBranch}分支`,
