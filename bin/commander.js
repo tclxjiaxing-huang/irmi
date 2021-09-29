@@ -9,7 +9,20 @@ const {
   delProject,
 } = require('../src/command/projects/project');
 const customStep = require('../src/command/customStep/customStep');
+const {
+  yellow,
+} = require('../src/utils/utils');
 
+const logo = `
+*****************************
+ ____  ____  __  __  ____ 
+(_  _)(  _ \\(  \\/  )(_  _)
+ _)(_  )   / )    (  _)(_ 
+(____)(_)\\_)(_/\\/\\_)(____)   
+ 
+*****************************
+`;
+// yellow(logo);
 const program = new Command();
 
 program.version('1.1.1');
@@ -19,7 +32,7 @@ program
   .description('配置项目文件路径(多个项目逗号隔开)')
   .action((filePath) => {
     saveFile(filePath);
-  });
+  })
 
 program
   .command('push')
@@ -50,7 +63,7 @@ program
   });
 
 program
-  .command('customStep')
+  .command('cstep')
   .description('自定义步骤')
   .action(async () => {
     await customStep();

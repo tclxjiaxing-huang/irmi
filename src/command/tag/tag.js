@@ -15,18 +15,6 @@ async function getAlreadyTag(filePath) {
   return vList;
 }
 
-// 标签命令
-const tag = (filePath, tagName, tagDesc) => execCMD.CMD(filePath, `git tag -a ${tagName} -m '${tagDesc}'`, `已打标签!(${tagName})`);
-const pushTag = (filePath) => execCMD.CMD(filePath, `git push origin --tags`, '已推送标签到仓库!');
-const delTag = (filePath, tagName) => execCMD.CMD(filePath, `git tag -d ${tagName}`, `已删除本地标签!(${tagName})`);
-const delOriginTag = (filePath, tagName) => execCMD.CMD(filePath, `git push origin :refs/tags/${tagName}`, `已删除远程标签!(${tagName})`);
-const tagCMD = {
-  tag,
-  pushTag,
-  delTag,
-  delOriginTag,
-};
-
 // 展示所有项目的tag
 async function showAllTag(filesData) {
   for (let i = 0; i < filesData.length; i += 1) {
@@ -145,7 +133,7 @@ async function chooseSubOptions(filePath, options, specParams) {
   const steps = options.split('-');
   const params = [filePath, ...specParams];
   for (let i = 0; i < steps.length; i += 1) {
-    await tagCMD[steps[i]](...params);
+    await execCMD[steps[i]](...params);
   }
 }
 

@@ -13,8 +13,8 @@ const {
 } = require('./log');
 
 async function CMD(path, execCode, afterTips = '', beforeTips = '') {
-  const spinner = await spin();
   return new Promise(async (resolve, reject) => {
+    const spinner = await spin();
     beforeTips && spinner.start(beforeTips);
     exec(execCode, {
       cwd: path,
@@ -46,7 +46,15 @@ const remoteSet = async (path, url) => await CMD(path, `git remote origin set-ur
 const remoteDel = async (path) => await CMD(path, `git remote rm origin`, `已删除远程仓库地址`, `正在删除远程仓库地址...`);
 const remoteAdd = async (path, url) => await CMD(path, `git remote add origin ${url}`, `已配置远程仓库地址`, `正在配置远程仓库地址...`);
 const branch = async (path, branch = 'dev') => await CMD(path, `git branch ${branch}`, `已创建${branch}分支`, `正在创建${branch}分支...`);
+const delBranch = async (path, branch = 'dev') => await CMD(path, `git branch -D ${branch}`, `已删除${branch}分支`, `正在删除${branch}分支...`);
+const checkBranch = async (path) => await CMD(path, `git branch -a`);
 const status = async (path) => await CMD(path, `git status`, '');
+
+// 标签命令
+const tag = (filePath, tagName, tagDesc) => execCMD.CMD(filePath, `git tag -a ${tagName} -m '${tagDesc}'`, `已打标签!(${tagName})`, `正在打标签!(${tagName})...`);
+const pushTag = (filePath) => execCMD.CMD(filePath, `git push origin --tags`, '已推送标签到仓库!', '正在推送标签到仓库!...');
+const delTag = (filePath, tagName) => execCMD.CMD(filePath, `git tag -d ${tagName}`, `已删除本地标签!(${tagName})`, `正在删除本地标签!(${tagName})...`);
+const delOriginTag = (filePath, tagName) => execCMD.CMD(filePath, `git push origin :refs/tags/${tagName}`, `已删除远程标签!(${tagName})`, `正在删除远程标签!(${tagName})...`);
 
 const execCMD = {
   CMD,
@@ -60,10 +68,16 @@ const execCMD = {
   pull,
   init,
   branch,
+  delBranch,
+  checkBranch,
   remoteAdd,
   remoteDel,
   remoteSet,
   status,
+  tag,
+  pushTag,
+  delTag,
+  delOriginTag,
 }
 
 module.exports = {

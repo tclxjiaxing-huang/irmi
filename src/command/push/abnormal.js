@@ -1,3 +1,4 @@
+const inquirer = require('inquirer');
 const {
   execCMD,
   red,
@@ -60,7 +61,18 @@ async function timeOut(params, filePath, targetBranch, CMD) {
 }
 // 沒有对应的分支名称
 async function notMatchBranch(params, filePath, targetBranch) {
-  await execCMD.branch(filePath, targetBranch);
+  // 询问是否创建对应的分支
+  console.log(1);
+  const { isConfirm } = await inquirer.prompt([{
+    type: 'confirm',
+    message: `是否创建${targetBranch}分支`,
+    name: 'isConfirm',
+  }]);
+  if (isConfirm) {
+    await execCMD.branch(filePath, targetBranch);
+  } else {
+    process.exit(0);
+  }
 }
 // 没有commit代码
 async function notCommitCode(params, filePath) {

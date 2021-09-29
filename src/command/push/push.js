@@ -24,6 +24,9 @@ const defaultStep = [{
 },  {
   name: '提交代码->推送->合并到test->推送',
   value: 'add-commit-push-checkout(test)-merge(dev)-push-checkout(dev)',
+},  {
+  name: '删除分支',
+  value: 'delBranch',
 }];
 
 // 执行系列命令前，先切换到dev分支
@@ -34,6 +37,11 @@ async function checkoutDev(filePath) {
     await execCMD.branch(filePath, branch);
     await checkoutDev(filePath);
   }
+}
+// 获取所有分支
+async function getAllBranch(filePath) {
+  const branch = await execCMD.checkBranch(filePath);
+  return branch.split('\n').map((item) => item.replace(/^[\s\*]*/, '')).filter((item) => item && item.indexOf('remotes') === -1);
 }
 
 async function chooseSubOptions(filePath, options) {
@@ -46,6 +54,7 @@ async function chooseSubOptions(filePath, options) {
     let CMD = steps[i]; // 统一命令方法
     const params = [filePath]; // 统一命令方法的参数 [文件路径, commit说明/分支]
     const isCommit = steps[i].indexOf('commit') !== -1; // 当前步骤是否有commit操作，有的话会提示输入备注
+    const isDelBranch = steps[i].indexOf('delBranch') !== -1; // 当前步骤是否有commit操作，有的话会提示输入备注
     if (isCommit) {
       const { commitMsg } = await inquirer.prompt([{
         type: 'input',
@@ -53,53 +62,30 @@ async function chooseSubOptions(filePath, options) {
         message: '请输入commit说明',
         default: '提交',
       }]);
-      params.push(commitMsg)
+      params.push(commitMsg);
+    }
+    if (isDelBranch) {
+      const branchList = await getAllBranch(filePath);
+      const { delBranch } = await inquirer.prompt([{
+        type: 'list',
+        name: 'delBranch',
+        message: '请输入commit说明',
+        choices: branchList.map((item) => ({
+          name: item,
+          value: item,
+        })),
+      }]);
+      params.push(delBranch);
     }
     if (isBranch) {
       targetBranch = steps[i].match(branchRegx)[2]; // 如果是分支操作，则第二个参数为分支名称
       params.push(targetBranch);
       CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名
     }
+    console.log(params);
     await execCMD[CMD](...params).catch(async (errObj) => {
       await abnormal(errObj, params, filePath, targetBranch, CMD);
     });
-    // if (result === 'pull') {
-    //   await execCMD.pull(...params);
-    //   await execCMD[CMD](...params);
-    // } else if (result === 'origin') {
-    //   await setOrigin(...params);
-    //   await execCMD[CMD](...params);
-    // } else if (result === 'errorOriginUrl') {
-    //   await execCMD.remoteDel(filePath);
-    //   await setOrigin(filePath);
-    //   await execCMD[CMD](...params);
-    // } else if (result === 'init') {
-    //   await init(filePath);
-    // } else if (result === 'noUpStream') {
-    //   await execCMD.pushUpStream(filePath, targetBranch);
-    // } else if (result === 'timeOut') {
-    //   let num = 1;
-    //   await (async function reTry() {
-    //     const res = await execCMD[CMD](...params);
-    //     if (res === 'timeOut') {
-    //       num++;
-    //       if (num >= 3) {
-    //         red('网络错误!');
-    //         process.exit(0);
-    //         return;
-    //       } else {
-    //         await reTry();
-    //       }
-    //     };
-    //   })();
-    // } else if (result === 'notMatchBranch') {
-    //   await execCMD.branch(filePath, targetBranch);
-    //   await execCMD[CMD](...params);
-    // } else if (result === 'notCommitCode') {
-    //   await execCMD.add(filePath);
-    //   await execCMD.commit(filePath);
-    //   await execCMD[CMD](...params);
-    // }
   }
 }
 

@@ -11,15 +11,15 @@ const delStep = require('./delStep');
 // 推送步骤
 const pushStepList = {
   add: {
-    name: '添加代码到暂存区(add)',
+    name: '添加到暂存区(add)',
     value: 'add',
   },
   commit: {
-    name: '添加代码到本地仓库(commit)',
+    name: '添加到本地仓库(commit)',
     value: 'commit',
   },
   push: {
-    name: '推送代码到远程仓库(push)',
+    name: '推送到远程仓库(push)',
     value: 'push',
   },
   checkout: {
@@ -71,11 +71,12 @@ async function pushStep() {
   let isFinsh = false;
   const subStepRegx = /^(.*)\((.*)\)$/;
   const stepList = [];
+  let lastStep = null;
   while (!isFinsh) {
     let { stepTag } = await inquirer.prompt([{
       type: 'list',
       name: 'stepTag',
-      choices: Object.keys(pushStepList).map((step) => ({
+      choices: Object.keys(pushStepList).filter((step) => pushStepList[step].value !== lastStep).map((step) => ({
         name: pushStepList[step].name,
         value: pushStepList[step].value,
       })),
@@ -99,11 +100,12 @@ async function pushStep() {
       } else {
         isFinsh = true;
       }
-    } else {
+    } else if (stepValue !== lastStep){
       stepList.push({
         name: stepName,
         value: stepValue,
       });
+      lastStep = stepValue;
     }
   }
   const stepPrompt = {
