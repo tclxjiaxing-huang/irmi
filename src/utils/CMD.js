@@ -1,7 +1,10 @@
 const { exec } = require('child_process');
 async function spin() {
   const ora = await import('ora');
-  return ora.default;
+  const spinner = ora.default({
+    color: 'blue',
+  });
+  return spinner;
 }
 const errorMsg = require('./errorMsg');
 const {
@@ -12,9 +15,8 @@ const {
 
 async function CMD(path, execCode, afterTips = '', beforeTips = '') {
   return new Promise(async (resolve) => {
-    const ora = await spin();
-    const spinner = ora(beforeTips);
-    beforeTips && spinner.start();
+    const spinner = await spin();
+    beforeTips && spinner.start(beforeTips);
     exec(execCode, {
       cwd: path,
     }, (err, stdout) => {
