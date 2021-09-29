@@ -10,12 +10,11 @@ const errorMsg = require('./errorMsg');
 const {
   red,
   yellow,
-  chalk,
 } = require('./log');
 
 async function CMD(path, execCode, afterTips = '', beforeTips = '') {
-  return new Promise(async (resolve) => {
-    const spinner = await spin();
+  const spinner = await spin();
+  return new Promise(async (resolve, reject) => {
     beforeTips && spinner.start(beforeTips);
     exec(execCode, {
       cwd: path,
@@ -24,7 +23,7 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
       if (err) {
         const errObj = errorMsg(JSON.stringify(err.message));
         errObj && yellow(`提示: ${errObj.desc}`);
-        errObj && errObj.value && resolve(errObj.value);
+        errObj && errObj.value && reject(errObj);
         !errObj && red(`error: ${err}`);
         return;
       };

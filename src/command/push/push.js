@@ -12,6 +12,7 @@ const {
   setOrigin,
   getCurrBranch,
 } = require('../../init');
+const abnormal = require('./abnormal');
 
 // 默认步骤
 const defaultStep = [{
@@ -43,7 +44,7 @@ async function chooseSubOptions(filePath, options) {
     let targetBranch = currBranch; // 如果涉及到分支操作的目标分支
     const isBranch = branchRegx.test(steps[i]); // 当前步骤是否有分支操作
     let CMD = steps[i]; // 统一命令方法
-    const param = [filePath]; // 统一命令方法的参数 [文件路径, commit说明/分支]
+    const params = [filePath]; // 统一命令方法的参数 [文件路径, commit说明/分支]
     const isCommit = steps[i].indexOf('commit') !== -1; // 当前步骤是否有commit操作，有的话会提示输入备注
     if (isCommit) {
       const { commitMsg } = await inquirer.prompt([{
@@ -52,51 +53,55 @@ async function chooseSubOptions(filePath, options) {
         message: '请输入commit说明',
         default: '提交',
       }]);
-      param.push(commitMsg)
+      params.push(commitMsg)
     }
     if (isBranch) {
       targetBranch = steps[i].match(branchRegx)[2]; // 如果是分支操作，则第二个参数为分支名称
-      param.push(targetBranch);
+      params.push(targetBranch);
       CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名
     }
-    const result = await execCMD[CMD](...param);
-    if (result === 'pull') {
-      await execCMD.pull(...param);
-      await execCMD[CMD](...param);
-    } else if (result === 'origin') {
-      await setOrigin(...param);
-      await execCMD[CMD](...param);
-    } else if (result === 'errorOriginUrl') {
-      await execCMD.remoteDel(filePath);
-      await setOrigin(filePath);
-      await execCMD[CMD](...param);
-    } else if (result === 'init') {
-      await init(filePath);
-    } else if (result === 'noUpStream') {
-      await execCMD.pushUpStream(filePath, targetBranch);
-    } else if (result === 'timeOut') {
-      let num = 1;
-      await (async function reTry() {
-        const res = await execCMD[CMD](...param);
-        if (res === 'timeOut') {
-          num++;
-          if (num >= 3) {
-            red('网络错误!');
-            process.exit(0);
-            return;
-          } else {
-            await reTry();
-          }
-        };
-      })();
-    } else if (result === 'notMatchBranch') {
-      await execCMD.branch(filePath, targetBranch);
-      await execCMD[CMD](...param);
-    } else if (result === 'notCommitCode') {
-      await execCMD.add(filePath);
-      await execCMD.commit(filePath);
-      await execCMD[CMD](...param);
-    }
+    const result = await execCMD[CMD](...params).catch(async (errObj) => {
+      await abnormal(errObj, params, filePath, targetBranch, CMD);
+    });
+
+    console.log(result);
+    // if (result === 'pull') {
+    //   await execCMD.pull(...params);
+    //   await execCMD[CMD](...params);
+    // } else if (result === 'origin') {
+    //   await setOrigin(...params);
+    //   await execCMD[CMD](...params);
+    // } else if (result === 'errorOriginUrl') {
+    //   await execCMD.remoteDel(filePath);
+    //   await setOrigin(filePath);
+    //   await execCMD[CMD](...params);
+    // } else if (result === 'init') {
+    //   await init(filePath);
+    // } else if (result === 'noUpStream') {
+    //   await execCMD.pushUpStream(filePath, targetBranch);
+    // } else if (result === 'timeOut') {
+    //   let num = 1;
+    //   await (async function reTry() {
+    //     const res = await execCMD[CMD](...params);
+    //     if (res === 'timeOut') {
+    //       num++;
+    //       if (num >= 3) {
+    //         red('网络错误!');
+    //         process.exit(0);
+    //         return;
+    //       } else {
+    //         await reTry();
+    //       }
+    //     };
+    //   })();
+    // } else if (result === 'notMatchBranch') {
+    //   await execCMD.branch(filePath, targetBranch);
+    //   await execCMD[CMD](...params);
+    // } else if (result === 'notCommitCode') {
+    //   await execCMD.add(filePath);
+    //   await execCMD.commit(filePath);
+    //   await execCMD[CMD](...params);
+    // }
   }
 }
 
