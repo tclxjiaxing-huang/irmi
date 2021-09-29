@@ -13,7 +13,7 @@ const {
 async function CMD(path, execCode, afterTips = '', beforeTips = '') {
   return new Promise(async (resolve) => {
     const ora = await spin();
-    const spinner = ora(chalk.blueBright(beforeTips));
+    const spinner = ora(beforeTips);
     beforeTips && spinner.start();
     exec(execCode, {
       cwd: path,
@@ -26,7 +26,7 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
         !errObj && red(`error: ${err}`);
         return;
       };
-      afterTips && spinner.succeed(chalk.greenBright(afterTips));
+      afterTips && spinner.succeed(afterTips);
       resolve(stdout);
     });
   });
