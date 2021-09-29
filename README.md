@@ -1,9 +1,9 @@
-## gat
+## irmi
 #### 一个简易的git项目管理库
 
 ### 安装
 ```shell script
-npm install wkgit -g
+npm install irmi -g
 ```
 
 ### 使用
