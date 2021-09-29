@@ -18,6 +18,7 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
     exec(execCode, {
       cwd: path,
     }, (err, stdout) => {
+      spinner.clear();
       if (err) {
         const errObj = errorMsg(JSON.stringify(err.message));
         errObj && yellow(`提示: ${errObj.desc}`);
@@ -25,7 +26,6 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
         !errObj && red(`error: ${err}`);
         return;
       };
-      process.stdout.write('\n');
       afterTips && spinner.succeed(afterTips);
       resolve(stdout);
     });
