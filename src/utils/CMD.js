@@ -6,14 +6,14 @@ async function spin() {
 const errorMsg = require('./errorMsg');
 const {
   red,
-  green,
   yellow,
+  chalk,
 } = require('./log');
 
 async function CMD(path, execCode, afterTips = '', beforeTips = '') {
   return new Promise(async (resolve) => {
     const ora = await spin();
-    const spinner = ora(beforeTips);
+    const spinner = ora(chalk.blueBright(beforeTips));
     beforeTips && spinner.start();
     exec(execCode, {
       cwd: path,
@@ -26,7 +26,7 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
         !errObj && red(`error: ${err}`);
         return;
       };
-      afterTips && spinner.succeed(afterTips);
+      afterTips && spinner.succeed(chalk.greenBright(afterTips));
       resolve(stdout);
     });
   });

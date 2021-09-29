@@ -15,4 +15,5 @@ module.exports = {
   green,
   yellow,
   yellowBright,
+  chalk,
 }
