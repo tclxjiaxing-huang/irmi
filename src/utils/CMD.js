@@ -2,7 +2,7 @@ const { exec } = require('child_process');
 async function spin() {
   const ora = await import('ora');
   const spinner = ora.default({
-    color: 'blue',
+    color: 'yellow',
   });
   return spinner;
 }
