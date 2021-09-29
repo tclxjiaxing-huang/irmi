@@ -60,11 +60,9 @@ async function chooseSubOptions(filePath, options) {
       params.push(targetBranch);
       CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名
     }
-    const result = await execCMD[CMD](...params).catch(async (errObj) => {
+    await execCMD[CMD](...params).catch(async (errObj) => {
       await abnormal(errObj, params, filePath, targetBranch, CMD);
     });
-
-    console.log(result);
     // if (result === 'pull') {
     //   await execCMD.pull(...params);
     //   await execCMD[CMD](...params);

@@ -7,6 +7,7 @@ const {
   init,
 } = require('../../init');
 
+// 异常情况策略
 const abnormalList = {
   pull: pull,
   origin: origin,
@@ -67,7 +68,6 @@ async function notCommitCode(params, filePath) {
 }
 
 async function abnormal(resultObj, params, filePath, targetBranch, CMD) {
-  console.log(resultObj);
   await abnormalList[resultObj.value](params, filePath, targetBranch, CMD);
   resultObj.isReCMD && await execCMD[CMD](...params);
 }
