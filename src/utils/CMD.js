@@ -1,4 +1,8 @@
 const { exec } = require('child_process');
+async function spin() {
+  const ora = await import('ora');
+  return ora.default;
+}
 const errorMsg = require('./errorMsg');
 const {
   red,
@@ -6,8 +10,11 @@ const {
   yellow,
 } = require('./log');
 
-async function CMD(path, execCode, tips = '', isLog = false) {
-  return new Promise((resolve) => {
+async function CMD(path, execCode, afterTips = '', beforeTips = '') {
+  return new Promise(async (resolve) => {
+    const ora = await spin();
+    const spinner = ora(beforeTips);
+    beforeTips && spinner.start();
     exec(execCode, {
       cwd: path,
     }, (err, stdout) => {
@@ -18,27 +25,27 @@ async function CMD(path, execCode, tips = '', isLog = false) {
         !errObj && red(`error: ${err}`);
         return;
       };
-      tips && green(tips);
-      isLog && yellow(stdout);
+      process.stdout.write('\n');
+      afterTips && spinner.succeed(afterTips);
       resolve(stdout);
     });
   });
 }
 
-const remoteSet = async (path, url) => await CMD(path, `git remote origin set-url ${url}`, `已修改远程仓库地址`);
-const remoteDel = async (path) => await CMD(path, `git remote rm origin`, `已删除远程仓库地址`);
-const remoteAdd = async (path, url) => await CMD(path, `git remote add origin ${url}`, `已配置远程仓库地址`);
-const branch = async (path, branch = 'dev') => await CMD(path, `git branch ${branch}`, `已创建${branch}分支`);
-const status = async (path) => await CMD(path, `git status`, '');
-const init = async (path) => await CMD(path, 'git init', '已初始化');
-const add = async (path) => await CMD(path, 'git add .', '已添加到暂存区');
-const commit = async (path, msg = '提交') => await CMD(path, `git commit -m ${msg}`, '已添加到本地仓库');
+const init = async (path) => await CMD(path, 'git init', '已初始化', '正在初始化...');
+const add = async (path) => await CMD(path, 'git add .', '已添加到暂存区', '正在添加到暂存区...');
+const commit = async (path, msg = '提交') => await CMD(path, `git commit -m ${msg}`, '已添加到本地仓库', '正在添加到本地仓库...');
 const push = async (path) => await CMD(path, `git push`, '已推送到远程仓库');
-const pushOrigin = async (path, branch = 'master') => await CMD(path, `git push -u origin ${branch}`, `已推送${branch}分支到远程仓库`);
-const pushUpStream = async (path, branch = 'dev') => await CMD(path, `git push --set-upstream origin ${branch}`, `已与远程${branch}分支建立连接并推送`);
-const pull = async (path) => await CMD(path, `git pull`, '已从远程仓库拉取代码');
-const checkout = async (path, branch = 'test') => await CMD(path, `git checkout ${branch}`, `已切换${branch}分支`);
-const merge = async (path, branch = 'dev') => await CMD(path, `git merge ${branch}`, `已与${branch}分支合并`);
+const pushOrigin = async (path, branch = 'master') => await CMD(path, `git push -u origin ${branch}`, `已推送${branch}分支到远程仓库`, `正在推送${branch}分支到远程仓库...`);
+const pushUpStream = async (path, branch = 'dev') => await CMD(path, `git push --set-upstream origin ${branch}`, `已与远程${branch}分支建立连接并推送`, `正在与远程${branch}分支建立连接并推送...`);
+const pull = async (path) => await CMD(path, `git pull`, '已从远程仓库拉取代码', '正在从远程仓库拉取代码...');
+const checkout = async (path, branch = 'test') => await CMD(path, `git checkout ${branch}`, `已切换${branch}分支`, `正在切换${branch}分支...`);
+const merge = async (path, branch = 'dev') => await CMD(path, `git merge ${branch}`, `已与${branch}分支合并`, `正在与${branch}分支合并...`);
+const remoteSet = async (path, url) => await CMD(path, `git remote origin set-url ${url}`, `已修改远程仓库地址`, `正在修改远程仓库地址...`);
+const remoteDel = async (path) => await CMD(path, `git remote rm origin`, `已删除远程仓库地址`, `正在删除远程仓库地址...`);
+const remoteAdd = async (path, url) => await CMD(path, `git remote add origin ${url}`, `已配置远程仓库地址`, `正在配置远程仓库地址...`);
+const branch = async (path, branch = 'dev') => await CMD(path, `git branch ${branch}`, `已创建${branch}分支`, `正在创建${branch}分支...`);
+const status = async (path) => await CMD(path, `git status`, '');
 
 const execCMD = {
   CMD,
