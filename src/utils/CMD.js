@@ -35,7 +35,7 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
 const init = async (path) => await CMD(path, 'git init', '已初始化', '正在初始化...');
 const add = async (path) => await CMD(path, 'git add .', '已添加到暂存区', '正在添加到暂存区...');
 const commit = async (path, msg = '提交') => await CMD(path, `git commit -m ${msg}`, '已添加到本地仓库', '正在添加到本地仓库...');
-const push = async (path) => await CMD(path, `git push`, '已推送到远程仓库');
+const push = async (path) => await CMD(path, `git push`, '已推送到远程仓库', '正在推送到远程仓库...');
 const pushOrigin = async (path, branch = 'master') => await CMD(path, `git push -u origin ${branch}`, `已推送${branch}分支到远程仓库`, `正在推送${branch}分支到远程仓库...`);
 const pushUpStream = async (path, branch = 'dev') => await CMD(path, `git push --set-upstream origin ${branch}`, `已与远程${branch}分支建立连接并推送`, `正在与远程${branch}分支建立连接并推送...`);
 const pull = async (path) => await CMD(path, `git pull`, '已从远程仓库拉取代码', '正在从远程仓库拉取代码...');
