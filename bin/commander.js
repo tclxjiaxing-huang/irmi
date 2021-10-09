@@ -24,7 +24,6 @@ const logo = `
 `;
 // yellow(logo);
 const program = new Command();
-
 program.version('1.1.1');
 
 program

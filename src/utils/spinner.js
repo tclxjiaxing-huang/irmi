@@ -21,7 +21,7 @@ class Spinner {
   }
   async clear() {
     this.clearTimer();
-    await this.stream.write('\n');
+    await this.stream.write('\r');
   }
   clearTimer() {
     this.isSpinning = false;
