@@ -17,7 +17,7 @@ class Spinner {
   }
   succeed(text) {
     this.clear();
-    this.stream.write('√' + text + '\r');
+    this.stream.write('√' + text + '\n');
   }
   async clear() {
     this.clearTimer();
