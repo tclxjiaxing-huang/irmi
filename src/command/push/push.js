@@ -69,12 +69,18 @@ async function chooseSubOptions(filePath, options) {
       const { delBranch } = await inquirer.prompt([{
         type: 'list',
         name: 'delBranch',
-        message: '请输入commit说明',
+        message: '请选择要删除的分支',
         choices: branchList.map((item) => ({
           name: item,
           value: item,
-        })),
+        })).concat({
+          name: '跳过',
+          value: 'skip',
+        }),
       }]);
+      if (delBranch === 'skip') {
+        continue;
+      }
       params.push(delBranch);
     }
     if (isBranch) {
@@ -92,7 +98,10 @@ async function chooseSubOptions(filePath, options) {
 async function getCustomStep() {
   const res = await JSON.parse(readTempData(tempStepFile));
   if (res && res.push) {
-    return res.push;
+    return res.push.map((item) => ({
+      value: item.value,
+      name: item.label,
+    }));
   }
   return [];
 }
@@ -103,6 +112,7 @@ async function chooseOptions() {
     value: file.path,
   }));
   const customStep = await getCustomStep();
+  console.log(customStep);
   let { filesList } = await inquirer.prompt([{
     type: 'checkbox',
     name: 'filesList',

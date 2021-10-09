@@ -13,7 +13,7 @@ const {
 } = require('./log');
 
 async function CMD(path, execCode, afterTips = '', beforeTips = '') {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve) => {
     const spinner = await spin();
     beforeTips && spinner.start(beforeTips);
     exec(execCode, {
@@ -23,7 +23,7 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
       if (err) {
         const errObj = errorMsg(JSON.stringify(err.message));
         errObj && yellow(`提示: ${errObj.desc}`);
-        errObj && errObj.value && reject(errObj);
+        errObj && errObj.value && resolve(errObj);
         !errObj && red(`error: ${err}`);
         return;
       };
