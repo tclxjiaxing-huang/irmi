@@ -57,9 +57,9 @@ async function chooseSubOptions(filePath, options) {
     const isSubBranch = branchRegx.test(steps[i]); // 当前步骤是否有分支操作
     let CMD = steps[i]; // 统一命令方法
     const params = [filePath]; // 统一命令方法的参数 [文件路径, commit说明/分支]
-    const isCommit = steps[i].indexOf('commit') !== -1; // 当前步骤是否有commit操作，有的话会提示输入备注
-    const isDelBranch = steps[i].indexOf('delBranch') !== -1; // 当前步骤是否有删除分支操作，有的话会提示输入备注
-    const isCreateBranch = steps[i].indexOf('branch') !== -1; // 当前步骤是否有创建分钟操作，有的话会提示输入备注
+    const isCommit = ['commit'].includes(steps[i]); // 当前步骤是否有commit操作，有的话会提示输入备注
+    const isDelBranch = ['delBranch', 'delOriginBranch'].includes(steps[i]); // 当前步骤是否有删除分支操作，有的话会提示输入备注
+    const isCreateBranch = ['branch', 'pushUpStream'].includes(steps[i]); // 当前步骤是否有创建分钟操作，有的话会提示输入备注
     if (isCommit) {
       const { commitMsg } = await inquirer.prompt([{
         type: 'input',
