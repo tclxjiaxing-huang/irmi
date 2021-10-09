@@ -40,6 +40,15 @@ const pushStepList = {
       message: '请输入目标分支名称',
     }],
   },
+  delBranch: {
+    name: '删除分支(delBranch)',
+    value: 'delBranch(branchName)',
+    prompt: [{
+      type: 'list',
+      name: 'branchName',
+      message: '请选择删除分支名称',
+    }],
+  },
   pull: {
     name: '拉取代码(pull)',
     value: 'pull',
@@ -51,6 +60,7 @@ const pushStepList = {
   },
 }
 
+// 保存步骤
 async function saveStep(data, type) {
   let stepData = JSON.parse(readTempData(tempStepFile));
   if (!stepData) {
@@ -67,15 +77,32 @@ async function saveStep(data, type) {
   green('***推送步骤保存成功***');
 }
 
+// 命名
+async function setName() {
+  const { name } = await inquirer.prompt([{
+    type: 'input',
+    name: 'name',
+    message: '请为步骤输入一个名字',
+    validate: (value) => {
+      if (!value) return '名字不能为空';
+      return true;
+    }
+  }]);
+  return name;
+}
+
 async function pushStep() {
   let isFinsh = false;
   const subStepRegx = /^(.*)\((.*)\)$/;
   const stepList = [];
   let lastStep = null;
+  let stepNum = 0;
   while (!isFinsh) {
+    stepNum++;
     let { stepTag } = await inquirer.prompt([{
       type: 'list',
       name: 'stepTag',
+      message: `选择第${stepNum}步骤`,
       choices: Object.keys(pushStepList).filter((step) => pushStepList[step].value !== lastStep).map((step) => ({
         name: pushStepList[step].name,
         value: pushStepList[step].value,
@@ -86,7 +113,7 @@ async function pushStep() {
     // 判断是否有追加选项
     const subStep = stepTag.match(subStepRegx);
     if (subStep) {
-      stepValue = stepTag = subStep[1];
+      stepValue = stepTag = subStep[1]; // 匹配值
       stepName = pushStepList[stepTag].name.replace(/\(.*\)/, '');
       const answer = await inquirer.prompt(pushStepList[stepTag].prompt);
       stepValue += `(${answer[subStep[2]]})`;
@@ -97,6 +124,7 @@ async function pushStep() {
     if (stepTag === 'finish') {
       if (stepList.length === 0) {
         yellow('至少包含一个步骤');
+        stepNum--;
       } else {
         isFinsh = true;
       }
@@ -111,6 +139,7 @@ async function pushStep() {
   const stepPrompt = {
     name: [],
     value: [],
+    label: '',
   };
   stepList.forEach((step) => {
     stepPrompt.name.push(step.name);
@@ -118,6 +147,7 @@ async function pushStep() {
   });
   stepPrompt.name = stepPrompt.name.join('->');
   stepPrompt.value = stepPrompt.value.join('-');
+  stepPrompt.label = await setName();
   await saveStep(stepPrompt, 'push');
 }
 

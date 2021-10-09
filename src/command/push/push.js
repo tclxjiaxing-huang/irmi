@@ -1,15 +1,12 @@
 const inquirer = require('inquirer');
 const {
   execCMD,
-  red,
   yellowBright,
   readFilesPath,
   readTempData,
   tempStepFile,
 } = require('../../utils/utils');
 const {
-  init,
-  setOrigin,
   getCurrBranch,
 } = require('../../init');
 const abnormal = require('./abnormal');
@@ -33,7 +30,7 @@ const defaultStep = [{
 async function checkoutDev(filePath) {
   const branch = 'dev';
   const result = await execCMD.checkout(filePath, branch);
-  if (result === 'notMatchBranch') {
+  if (result.value === 'notMatchBranch') {
     await execCMD.branch(filePath, branch);
     await checkoutDev(filePath);
   }
@@ -41,9 +38,13 @@ async function checkoutDev(filePath) {
 // 获取所有分支
 async function getAllBranch(filePath) {
   const branch = await execCMD.checkBranch(filePath);
+  if (typeof branch === 'object') {
+    process.exit(0);
+  }
   return branch.split('\n').map((item) => item.replace(/^[\s\*]*/, '')).filter((item) => item && item.indexOf('remotes') === -1);
 }
 
+// 执行步骤
 async function chooseSubOptions(filePath, options) {
   const steps = options.split('-'); // 所有步骤
   const branchRegx = /^(.*)\((.*)\)$/; //带有分支的命令正则
@@ -69,7 +70,7 @@ async function chooseSubOptions(filePath, options) {
       const { delBranch } = await inquirer.prompt([{
         type: 'list',
         name: 'delBranch',
-        message: '请输入commit说明',
+        message: '请选择要删除的分支',
         choices: branchList.map((item) => ({
           name: item,
           value: item,
@@ -82,9 +83,13 @@ async function chooseSubOptions(filePath, options) {
       params.push(targetBranch);
       CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名
     }
-    await execCMD[CMD](...params).catch(async (errObj) => {
-      await abnormal(errObj, params, filePath, targetBranch, CMD);
-    });
+    await (async function execute() {
+      const errObj = await execCMD[CMD](...params);
+      if (typeof errObj === 'object') {
+        await abnormal(errObj, params, filePath, targetBranch, CMD);
+        errObj.isReCMD && await execute();
+      }
+    })();
   }
 }
 
@@ -92,10 +97,18 @@ async function chooseSubOptions(filePath, options) {
 async function getCustomStep() {
   const res = await JSON.parse(readTempData(tempStepFile));
   if (res && res.push) {
-    return res.push;
+    return res.push.map((item) => ({
+      name: item.label,
+      value: item.value,
+    }));
   }
   return [];
 }
+// 获取项目名称
+function getProjectName(filePath) {
+  return filePath.split('\\')[filePath.split('\\').length - 1];
+}
+// 选择应用
 async function chooseOptions() {
   const filesData = readFilesPath();
   const choices = filesData.map((file) => ({
@@ -119,7 +132,8 @@ async function chooseOptions() {
   }]);
   for (let i = 0; i < filesList.length; i += 1) {
     await checkoutDev(filesList[i]);
-    yellowBright(`***当前应用[${filesList[i]}]***`);
+    yellowBright(`***当前应用[${getProjectName(filesList[i])}]***`);
+    yellowBright(`***当前步骤[${options}]***`);
     await chooseSubOptions(filesList[i], options);
   }
 }

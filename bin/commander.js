@@ -63,7 +63,7 @@ program
   });
 
 program
-  .command('cstep')
+  .command('step')
   .description('自定义步骤')
   .action(async () => {
     await customStep();
