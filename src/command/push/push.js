@@ -117,13 +117,8 @@ async function getCustomStep() {
   const res = await JSON.parse(readTempData(tempStepFile));
   if (res && res.push) {
     return res.push.map((item) => ({
-<<<<<<< HEAD
-      value: item.value,
-      name: item.label,
-=======
       name: item.label,
       value: item.value,
->>>>>>> dev
     }));
   }
   return [];
