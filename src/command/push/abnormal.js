@@ -18,6 +18,7 @@ const abnormalList = {
   timeOut: timeOut,
   notMatchBranch: notMatchBranch,
   notCommitCode: notCommitCode,
+  commitMsgErr: commitMsgErr,
 }
 
 // 先拉取
@@ -38,8 +39,11 @@ async function initGit(params, filePath) {
   await init(filePath);
 }
 // 当前分支需要先链接远程仓库
-async function noUpStream(params, filePath, targetBranch) {
-  await execCMD.pushUpStream(filePath, targetBranch);
+async function noUpStream(params, filePath, targetBranch, CMD) {
+  const errObj = await execCMD.pushUpStream(filePath, targetBranch);
+  if (typeof errObj === 'object') {
+    await abnormal(errObj, params, filePath, targetBranch, CMD);
+  }
 }
 // 推送网络超时
 async function timeOut(params, filePath, targetBranch, CMD) {
@@ -49,7 +53,7 @@ async function timeOut(params, filePath, targetBranch, CMD) {
       if (errObj.value === 'timeOut') {
         num++;
         if (num >= 3) {
-          red('网络错误!');
+          red('网络错误!请检查网络!!');
           process.exit(0);
           return;
         } else {
@@ -78,10 +82,21 @@ async function notCommitCode(params, filePath) {
   await execCMD.add(filePath);
   await execCMD.commit(filePath);
 }
+// commit描述文字错误
+async function commitMsgErr(params) {
+  const { commitMsg } = await inquirer.prompt([{
+    type: 'input',
+    name: 'commitMsg',
+    message: '请输入commit说明',
+    default: '提交',
+  }]);
+  params[1] = commitMsg;
+}
 
 async function abnormal(resultObj, params, filePath, targetBranch, CMD) {
-  await abnormalList[resultObj.value](params, filePath, targetBranch, CMD);
-  resultObj.isReCMD && await execCMD[CMD](...params);
+  if (resultObj.value !== 'skip') {
+    await abnormalList[resultObj.value](params, filePath, targetBranch, CMD);
+  }
 }
 
 module.exports = abnormal;

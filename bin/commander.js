@@ -24,7 +24,6 @@ const logo = `
 `;
 // yellow(logo);
 const program = new Command();
-
 program.version('1.1.1');
 
 program
@@ -63,7 +62,7 @@ program
   });
 
 program
-  .command('cstep')
+  .command('step')
   .description('自定义步骤')
   .action(async () => {
     await customStep();

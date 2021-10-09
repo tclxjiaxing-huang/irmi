@@ -9,14 +9,16 @@ const {
   tempFileName,
 } = require('../../utils/utils');
 
-const filePathRegx = /^[A-Z]:(\\{1,2}[\w-]+)+$/
+const filePathRegx = /^[A-Z]:(\\{1,2}[\d\w-]+)+$/
 
 function saveFile(filePath) {
-  if (!filePathRegx.test(filePath)) {
-    red('当前路径有误，需为项目根目录的绝对路径，请重新输入!');
-    return;
-  }
-  const fileList = filePath.split(',').map((file) => ({
+  const fileList = filePath.split(',').filter((file) => {
+    if (!filePathRegx.test(file)) {
+      red(`${file}路径有误，需为项目根目录的绝对路径，请重新输入!`);
+      return false;
+    }
+    return true;
+  }).map((file) => ({
     name: file.split('\\')[file.split('\\').length - 1],
     path: file,
   }));

@@ -4,8 +4,9 @@ const errList = [{
   value: 'pull', // 返回值
   isReCMD: true, // 是否再次执行上一步操作
 }, {
-  msg: 'Command failed: git commit',
+  msg: 'No staged files match any of provided globs',
   desc: '未发现有修改的文件!',
+  isReCMD: false,
   value: 'skip',
 }, {
   msg: 'not a git repository',
@@ -18,14 +19,14 @@ const errList = [{
   value: 'origin',
   isReCMD: true,
 }, {
-  msg: 'src refspec czx does not match any',
+  msg: ' does not appear to be a git repository',
   desc: '远程仓库地址有误!',
   value: 'errorOriginUrl',
   isReCMD: true,
 }, {
   msg: 'To push the current branch and set the remote as upstream',
   desc: '当前分支没有与远程仓库建立连接!',
-  value: 'noUpStream',
+  value: 'errorOriginUrl',
   isReCMD: false,
 }, {
   msg: 'Timed out',
@@ -46,6 +47,11 @@ const errList = [{
   msg: 'Please commit your changes or stash them before you switch branches',
   desc: '当前分支有代码未提交，正在提交',
   value: 'notCommitCode',
+  isReCMD: true,
+}, {
+  msg: 'commit-msg hook exited with code 1',
+  desc: 'commit描述格式错误',
+  value: 'commitMsgErr',
   isReCMD: true,
 }];
 

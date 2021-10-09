@@ -14,8 +14,11 @@ async function delPush() {
     const { stepList } = await inquirer.prompt([{
       type: 'checkbox',
       name: 'stepList',
-      message: '选择推送步骤',
-      choices: push,
+      message: '选择要删除步骤',
+      choices: push.map((item) => ({
+        name: item.label,
+        value: item.value,
+      })),
     }]);
     for (let i = 0; i < push.length; i += 1) {
       for (let j = 0; j < stepList.length; j += 1) {

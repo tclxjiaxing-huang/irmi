@@ -1,3 +1,4 @@
+
 const inquirer = require('inquirer');
 const {
   execCMD,
@@ -18,6 +19,9 @@ async function init(filePath) {
 // 获取当前分支
 async function getCurrBranch(filePath) {
   const result = await execCMD.status(filePath);
+  if (typeof result === 'object') {
+    return null;
+  }
   const regx = /^On branch (.*)/;
   const res = result.match(regx);
   if (res) {
@@ -37,8 +41,8 @@ async function setOrigin(filePath) {
     },
   }]);
   await execCMD.remoteAdd(filePath, orginUrl);
-  const res = await execCMD.pushOrigin(filePath, 'master');
-  if (res === 'errorOriginUrl') {
+  const errObj = await execCMD.pushOrigin(filePath, 'master');
+  if (errObj.value === 'errorOriginUrl') {
     await execCMD.remoteDel(filePath);
     await setOrigin(filePath);
   }

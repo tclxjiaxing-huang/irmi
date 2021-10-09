@@ -1,33 +1,28 @@
 const { exec } = require('child_process');
-async function spin() {
-  const ora = await import('ora');
-  const spinner = ora.default({
-    color: 'yellow',
-  });
-  return spinner;
-}
+const spinner = require('./spinner');
 const errorMsg = require('./errorMsg');
 const {
   red,
   yellow,
+  green,
 } = require('./log');
 
 async function CMD(path, execCode, afterTips = '', beforeTips = '') {
   return new Promise(async (resolve) => {
-    const spinner = await spin();
-    beforeTips && spinner.start(beforeTips);
+    beforeTips && await spinner.start(beforeTips);
     exec(execCode, {
       cwd: path,
-    }, (err, stdout) => {
-      spinner.clear();
+    }, async (err, stdout) => {
+      spinner.isSpinning && await spinner.clear();
       if (err) {
         const errObj = errorMsg(JSON.stringify(err.message));
         errObj && yellow(`提示: ${errObj.desc}`);
-        errObj && errObj.value && resolve(errObj);
         !errObj && red(`error: ${err}`);
+        errObj && errObj.value && resolve(errObj);
         return;
       };
-      afterTips && spinner.succeed(afterTips);
+      afterTips && await spinner.succeed(afterTips);
+      // afterTips && green(afterTips);
       resolve(stdout);
     });
   });
@@ -35,7 +30,7 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
 
 const init = async (path) => await CMD(path, 'git init', '已初始化', '正在初始化...');
 const add = async (path) => await CMD(path, 'git add .', '已添加到暂存区', '正在添加到暂存区...');
-const commit = async (path, msg = '提交') => await CMD(path, `git commit -m ${msg}`, '已添加到本地仓库', '正在添加到本地仓库...');
+const commit = async (path, msg = '提交') => await CMD(path, `git commit -m "${msg}"`, '已添加到本地仓库', '正在添加到本地仓库...');
 const push = async (path) => await CMD(path, `git push`, '已推送到远程仓库', '正在推送到远程仓库...');
 const pushOrigin = async (path, branch = 'master') => await CMD(path, `git push -u origin ${branch}`, `已推送${branch}分支到远程仓库`, `正在推送${branch}分支到远程仓库...`);
 const pushUpStream = async (path, branch = 'dev') => await CMD(path, `git push --set-upstream origin ${branch}`, `已与远程${branch}分支建立连接并推送`, `正在与远程${branch}分支建立连接并推送...`);
@@ -49,7 +44,6 @@ const branch = async (path, branch = 'dev') => await CMD(path, `git branch ${bra
 const delBranch = async (path, branch = 'dev') => await CMD(path, `git branch -D ${branch}`, `已删除${branch}分支`, `正在删除${branch}分支...`);
 const checkBranch = async (path) => await CMD(path, `git branch -a`);
 const status = async (path) => await CMD(path, `git status`, '');
-
 // 标签命令
 const tag = (filePath, tagName, tagDesc) => execCMD.CMD(filePath, `git tag -a ${tagName} -m '${tagDesc}'`, `已打标签!(${tagName})`, `正在打标签!(${tagName})...`);
 const pushTag = (filePath) => execCMD.CMD(filePath, `git push origin --tags`, '已推送标签到仓库!', '正在推送标签到仓库!...');
