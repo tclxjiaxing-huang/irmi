@@ -10,7 +10,7 @@ class Spinner {
     let x = 0;
     this.isSpinning = true;
     this.timer = await setInterval(async () => {
-      await this.stream.write(chalk.grey(this.P[x++]) + chalk.grey(text) + '\r');
+      await this.stream.write(chalk.yellow(this.P[x++]) + chalk.yellow(text) + '\r');
       if (x >= this.P.length) {
         x = 0;
       }
