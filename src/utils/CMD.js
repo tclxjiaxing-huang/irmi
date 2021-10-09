@@ -21,7 +21,7 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
         errObj && errObj.value && resolve(errObj);
         return;
       };
-      afterTips && spinner.succeed(afterTips);
+      afterTips && await spinner.succeed(afterTips);
       // afterTips && green(afterTips);
       resolve(stdout);
     });

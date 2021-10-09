@@ -16,8 +16,8 @@ class Spinner {
       }
     }, 250);
   }
-  succeed(text) {
-    this.clear();
+  async succeed(text) {
+    await this.clear();
     this.stream.write(chalk.green(`√${text}`) + '\n');
   }
   async clear() {
