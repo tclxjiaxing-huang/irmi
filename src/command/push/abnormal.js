@@ -53,7 +53,7 @@ async function timeOut(params, filePath, targetBranch, CMD) {
       if (errObj.value === 'timeOut') {
         num++;
         if (num >= 3) {
-          red('网络错误!');
+          red('网络错误!请检查网络!!');
           process.exit(0);
           return;
         } else {
