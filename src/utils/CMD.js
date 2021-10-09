@@ -22,7 +22,7 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
         return;
       };
       // afterTips && spinner.succeed(afterTips);
-      green(afterTips);
+      afterTips && green(afterTips);
       resolve(stdout);
     });
   });

@@ -83,6 +83,7 @@ async function chooseSubOptions(filePath, options) {
       params.push(targetBranch);
       CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名
     }
+    console.log(2);
     await (async function execute() {
       const errObj = await execCMD[CMD](...params);
       if (typeof errObj === 'object') {
