@@ -24,6 +24,9 @@ const defaultStep = [{
 },  {
   name: '删除分支',
   value: 'delBranch',
+},  {
+  name: '创建分支',
+  value: 'branch',
 }];
 
 // 执行系列命令前，先切换到dev分支
@@ -51,11 +54,12 @@ async function chooseSubOptions(filePath, options) {
   for (let i = 0; i < steps.length; i += 1) {
     let currBranch = await getCurrBranch(); // 当前分支
     let targetBranch = currBranch; // 如果涉及到分支操作的目标分支
-    const isBranch = branchRegx.test(steps[i]); // 当前步骤是否有分支操作
+    const isSubBranch = branchRegx.test(steps[i]); // 当前步骤是否有分支操作
     let CMD = steps[i]; // 统一命令方法
     const params = [filePath]; // 统一命令方法的参数 [文件路径, commit说明/分支]
     const isCommit = steps[i].indexOf('commit') !== -1; // 当前步骤是否有commit操作，有的话会提示输入备注
-    const isDelBranch = steps[i].indexOf('delBranch') !== -1; // 当前步骤是否有commit操作，有的话会提示输入备注
+    const isDelBranch = steps[i].indexOf('delBranch') !== -1; // 当前步骤是否有删除分支操作，有的话会提示输入备注
+    const isCreateBranch = steps[i].indexOf('branch') !== -1; // 当前步骤是否有创建分钟操作，有的话会提示输入备注
     if (isCommit) {
       const { commitMsg } = await inquirer.prompt([{
         type: 'input',
@@ -78,7 +82,16 @@ async function chooseSubOptions(filePath, options) {
       }]);
       params.push(delBranch);
     }
-    if (isBranch) {
+    if (isCreateBranch) {
+      const { branchName } = await inquirer.prompt([{
+        type: 'input',
+        name: 'branchName',
+        message: '请输入分支名称',
+        default: 'dev',
+      }]);
+      params.push(branchName);
+    }
+    if (isSubBranch) {
       targetBranch = steps[i].match(branchRegx)[2]; // 如果是分支操作，则第二个参数为分支名称
       params.push(targetBranch);
       CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名

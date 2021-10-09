@@ -40,14 +40,13 @@ const pushStepList = {
       message: '请输入目标分支名称',
     }],
   },
+  branch: {
+    name: '创建分支(branch)',
+    value: 'branch',
+  },
   delBranch: {
     name: '删除分支(delBranch)',
-    value: 'delBranch(branchName)',
-    prompt: [{
-      type: 'list',
-      name: 'branchName',
-      message: '请选择删除分支名称',
-    }],
+    value: 'delBranch',
   },
   pull: {
     name: '拉取代码(pull)',
@@ -98,6 +97,7 @@ async function pushStep() {
   let lastStep = null;
   let stepNum = 0;
   while (!isFinsh) {
+    console.log(isFinsh);
     stepNum++;
     let { stepTag } = await inquirer.prompt([{
       type: 'list',
