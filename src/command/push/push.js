@@ -7,9 +7,12 @@ const {
   tempStepFile,
 } = require('../../utils/utils');
 const {
+  checkOriginBranch,
+  checkRemote,
+  getAllBranch,
+  executeCMD,
   getCurrBranch,
-} = require('../../init');
-const abnormal = require('./abnormal');
+} = require('../../utils/gitUtil');
 
 // 默认步骤
 const defaultStep = [{
@@ -29,23 +32,45 @@ const defaultStep = [{
   value: 'branch',
 }];
 
-async function executeCMD(CMD, params, filePath, targetBranch) {
-  await (async function execute() {
-    const errObj = await execCMD[CMD](...params);
-    if (typeof errObj === 'object') {
-      await abnormal(errObj, params, filePath, targetBranch, CMD);
-      errObj.isReCMD && await execute();
-    }
-  })();
+
+// 询问是否删除远程分支
+async function askDelOriginBranch(params) {
+  const hasRemote = await checkRemote(params[0]);
+  const hasRemoteBranch = await checkOriginBranch(params[0], params[1]);
+  if (hasRemote && hasRemoteBranch) {
+    // 询问是否删除远程分支
+    const { isDelRemote } = await inquirer.prompt([{
+      type: 'confirm',
+      message: '该分支存在远程分支，是否删除？',
+      name: 'isDelRemote',
+    }]);
+    isDelRemote && await executeCMD('delOriginBranch', params, params[1]);
+  }
 }
 
-// 检测是否有远程分支
-async function checkRemote(params) {
-  const result = await execCMD.checkRemote(...params);
-  if (result.indexOf('push') !== -1) {
-    return true;
+// 询问是否添加远程分支
+async function askAddOriginBranch(params) {
+  const hasRemote = await checkRemote(params[0]);
+  const hasRemoteBranch = await checkOriginBranch(params[0], params[1]);
+  if (hasRemote) {
+    if (hasRemoteBranch) {
+      // 询问是否链接远程仓库并拉取远程分支代码
+      const { isUpstreamRemote } = await inquirer.prompt([{
+        type: 'confirm',
+        message: '该分支存在远程分支，是否链接？',
+        name: 'isUpstreamRemote',
+      }]);
+      isUpstreamRemote && await executeCMD('pushUpStream', params, params[1]);
+    } else {
+      // 询问是否推送当前分支到远程分支上
+      const { isPushRemote } = await inquirer.prompt([{
+        type: 'confirm',
+        message: '是否推送到远程仓库？',
+        name: 'isPushRemote',
+      }]);
+      isPushRemote && await executeCMD('pushUpStream', params, params[1]);
+    }
   }
-  return false;
 }
 
 // 执行系列命令前，先切换到dev分支
@@ -57,21 +82,13 @@ async function checkoutDev(filePath) {
     await checkoutDev(filePath);
   }
 }
-// 获取所有分支
-async function getAllBranch(filePath) {
-  const branch = await execCMD.checkBranch(filePath);
-  if (typeof branch === 'object') {
-    process.exit(0);
-  }
-  return branch.split('\n').map((item) => item.replace(/^[\s\*]*/, '')).filter((item) => item && item.indexOf('remotes') === -1);
-}
 
 // 执行步骤
 async function chooseSubOptions(filePath, options) {
   const steps = options.split('-'); // 所有步骤
   const branchRegx = /^(.*)\((.*)\)$/; //带有分支的命令正则
   for (let i = 0; i < steps.length; i += 1) {
-    let currBranch = await getCurrBranch(); // 当前分支
+    let currBranch = await getCurrBranch(filePath); // 当前分支
     let targetBranch = currBranch; // 如果涉及到分支操作的目标分支
     const isSubBranch = branchRegx.test(steps[i]); // 当前步骤是否有分支操作
     let CMD = steps[i]; // 统一命令方法
@@ -80,6 +97,7 @@ async function chooseSubOptions(filePath, options) {
     const isDelBranch = ['delBranch', 'delOriginBranch'].includes(steps[i]); // 当前步骤是否有删除分支操作，有的话会提示输入备注
     const isCreateBranch = ['branch', 'pushUpStream'].includes(steps[i]); // 当前步骤是否有创建分钟操作，有的话会提示输入备注
     if (isCommit) {
+      // commit操作
       const { commitMsg } = await inquirer.prompt([{
         type: 'input',
         name: 'commitMsg',
@@ -89,6 +107,7 @@ async function chooseSubOptions(filePath, options) {
       params.push(commitMsg);
     }
     if (isDelBranch) {
+      // 删除分支
       const branchList = await getAllBranch(filePath);
       const { delBranch } = await inquirer.prompt([{
         type: 'list',
@@ -100,10 +119,9 @@ async function chooseSubOptions(filePath, options) {
         })),
       }]);
       params.push(delBranch);
-      const hasOrigin = await checkRemote(params);
-      hasOrigin && await executeCMD('delOriginBranch', params, filePath, targetBranch);
     }
     if (isCreateBranch) {
+      // 创建分支
       const { branchName } = await inquirer.prompt([{
         type: 'input',
         name: 'branchName',
@@ -117,11 +135,9 @@ async function chooseSubOptions(filePath, options) {
       params.push(targetBranch);
       CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名
     }
-    await executeCMD(CMD, params, filePath, targetBranch);
-    if (isCreateBranch) {
-      const hasOrigin = await checkRemote(params);
-      hasOrigin && await executeCMD('pushUpStream', params, filePath, targetBranch);
-    }
+    await executeCMD(CMD, params, targetBranch);
+    isCreateBranch && await askAddOriginBranch(params);
+    isDelBranch && await askDelOriginBranch(params);
   }
 }
 

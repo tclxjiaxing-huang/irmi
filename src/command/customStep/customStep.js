@@ -44,17 +44,9 @@ const pushStepList = {
     name: '创建分支(branch)',
     value: 'branch',
   },
-  pushUpStream: {
-    name: '创建远程分支(pushUpStream)',
-    value: 'pushUpStream',
-  },
   delBranch: {
     name: '删除分支(delBranch)',
     value: 'delBranch',
-  },
-  delOriginBranch: {
-    name: '删除远程分支(delOriginBranch)',
-    value: 'delOriginBranch',
   },
   pull: {
     name: '拉取代码(pull)',

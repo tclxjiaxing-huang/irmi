@@ -13,7 +13,6 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
     exec(execCode, {
       cwd: path,
     }, async (err, stdout) => {
-      console.log(stdout);
       spinner.isSpinning && await spinner.clear();
       if (err) {
         const errObj = errorMsg(JSON.stringify(err.message));
@@ -44,7 +43,7 @@ const remoteDel = async (path) => await CMD(path, `git remote rm origin`, `已�
 const remoteAdd = async (path, url) => await CMD(path, `git remote add origin ${url}`, `已配置远程仓库地址`, `正在配置远程仓库地址...`);
 const branch = async (path, branch = 'dev') => await CMD(path, `git branch ${branch}`, `已创建${branch}分支`, `正在创建${branch}分支...`);
 const delBranch = async (path, branch = 'dev') => await CMD(path, `git branch -D ${branch}`, `已删除${branch}分支`, `正在删除${branch}分支...`);
-const delOriginBranch = async (path, branch = 'dev') => await CMD(path, `git push branch -d ${branch}`, `已删除远程${branch}分支`, `正在删除远程${branch}分支...`);
+const delOriginBranch = async (path, branch = 'dev') => await CMD(path, `git push origin --delete ${branch}`, `已删除远程${branch}分支`, `正在删除远程${branch}分支...`);
 const checkBranch = async (path) => await CMD(path, `git branch -a`);
 const status = async (path) => await CMD(path, `git status`, '');
 // 标签命令

@@ -1,12 +1,14 @@
 const inquirer = require('inquirer');
 const {
   execCMD,
+} = require('./CMD');
+const {
   red,
-} = require('../../utils/utils');
+} = require('./log')
 const {
   setOrigin,
   init,
-} = require('../../init');
+} = require('../init');
 
 // 异常情况策略
 const abnormalList = {
