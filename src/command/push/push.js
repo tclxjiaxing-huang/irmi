@@ -29,6 +29,25 @@ const defaultStep = [{
   value: 'branch',
 }];
 
+async function executeCMD(CMD, params, filePath, targetBranch) {
+  await (async function execute() {
+    const errObj = await execCMD[CMD](...params);
+    if (typeof errObj === 'object') {
+      await abnormal(errObj, params, filePath, targetBranch, CMD);
+      errObj.isReCMD && await execute();
+    }
+  })();
+}
+
+// 检测是否有远程分支
+async function checkRemote(params) {
+  const result = await execCMD.checkRemote(...params);
+  if (result.indexOf('push') !== -1) {
+    return true;
+  }
+  return false;
+}
+
 // 执行系列命令前，先切换到dev分支
 async function checkoutDev(filePath) {
   const branch = 'dev';
@@ -81,6 +100,8 @@ async function chooseSubOptions(filePath, options) {
         })),
       }]);
       params.push(delBranch);
+      const hasOrigin = await checkRemote(params);
+      hasOrigin && await executeCMD('delOriginBranch', params, filePath, targetBranch);
     }
     if (isCreateBranch) {
       const { branchName } = await inquirer.prompt([{
@@ -96,13 +117,11 @@ async function chooseSubOptions(filePath, options) {
       params.push(targetBranch);
       CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名
     }
-    await (async function execute() {
-      const errObj = await execCMD[CMD](...params);
-      if (typeof errObj === 'object') {
-        await abnormal(errObj, params, filePath, targetBranch, CMD);
-        errObj.isReCMD && await execute();
-      }
-    })();
+    await executeCMD(CMD, params, filePath, targetBranch);
+    if (isCreateBranch) {
+      const hasOrigin = await checkRemote(params);
+      hasOrigin && await executeCMD('pushUpStream', params, filePath, targetBranch);
+    }
   }
 }
 
