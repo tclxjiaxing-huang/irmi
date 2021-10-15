@@ -24,7 +24,7 @@ const errList = [{
   value: 'errorOriginUrl',
   isReCMD: true,
 }, {
-  msg: 'The current branch dev has no upstream branch',
+  msg: 'To push the current branch and set the remote as upstream',
   desc: '当前分支没有与远程仓库建立连接!',
   value: 'notConnectOriginUrl',
   isReCMD: false,
