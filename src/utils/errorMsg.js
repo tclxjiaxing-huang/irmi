@@ -9,6 +9,11 @@ const errList = [{
   isReCMD: false,
   value: 'skip',
 }, {
+  msg: 'Command failed: git commit',
+  desc: '未发现有修改的文件!',
+  isReCMD: false,
+  value: 'skip',
+}, {
   msg: 'not a git repository',
   desc: '该项目没有git初始化!',
   value: 'init',

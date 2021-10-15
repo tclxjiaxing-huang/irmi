@@ -13,10 +13,8 @@ async function CMD(path, execCode, afterTips = '', beforeTips = '') {
     exec(execCode, {
       cwd: path,
     }, async (err, stdout) => {
-      console.log(stdout);
       spinner.isSpinning && await spinner.clear();
       if (err) {
-        console.log(err);
         const errObj = errorMsg(JSON.stringify(err.message));
         errObj && yellow(`提示: ${errObj.desc}`);
         !errObj && red(`error: ${err}`);
