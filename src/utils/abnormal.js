@@ -38,10 +38,8 @@ async function errorOriginUrl(params) {
   await setOrigin(params[0]);
 }
 // 当前分支没有与远程分支建立连接
-async function notConnectOriginUrl(params) {
-  console.log(params);
-  process.exit(0);
-  await execCMD.pushUpStream(...params);
+async function notConnectOriginUrl(params, targetBranch) {
+  await execCMD.pushUpStream(...params, targetBranch);
 }
 // 初始化git项目
 async function initGit(params) {
