@@ -34,14 +34,18 @@ async function checkOriginBranch(filePath, targetBranch) {
 }
 
 // 执行命令
-async function executeCMD(CMD, params, targetBranch) {
+async function executeCMD(CMD, params, targetBranch = '') {
+  let result = '';
   await (async function execute() {
     const errObj = await execCMD[CMD](...params);
     if (typeof errObj === 'object') {
       await abnormal(errObj, params, targetBranch, CMD);
       errObj.isReCMD && await execute();
+    } else {
+      result = errObj;
     }
   })();
+  return result;
 }
 // 获取当前分支
 async function getCurrBranch(filePath) {
@@ -57,10 +61,20 @@ async function getCurrBranch(filePath) {
   return 'dev';
 }
 
+// 获取已存在的tag
+async function getAlreadyTag(filePath) {
+  const result = await executeCMD('checkTag', [filePath]);
+  if (!result) process.exit(0);
+  const vList = result.split(/\n/);
+  vList.pop();
+  return vList;
+}
+
 module.exports = {
   checkRemote,
   checkOriginBranch,
   getAllBranch,
   getCurrBranch,
   executeCMD,
+  getAlreadyTag,
 }

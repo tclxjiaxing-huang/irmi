@@ -51,6 +51,7 @@ const tag = (filePath, tagName, tagDesc) => execCMD.CMD(filePath, `git tag -a ${
 const pushTag = (filePath) => execCMD.CMD(filePath, `git push origin --tags`, '已推送标签到仓库!', '正在推送标签到仓库!...');
 const delTag = (filePath, tagName) => execCMD.CMD(filePath, `git tag -d ${tagName}`, `已删除本地标签!(${tagName})`, `正在删除本地标签!(${tagName})...`);
 const delOriginTag = (filePath, tagName) => execCMD.CMD(filePath, `git push origin :refs/tags/${tagName}`, `已删除远程标签!(${tagName})`, `正在删除远程标签!(${tagName})...`);
+const checkTag = (filePath) => execCMD.CMD(filePath, 'git tag');
 
 const execCMD = {
   CMD,
@@ -76,6 +77,7 @@ const execCMD = {
   delTag,
   delOriginTag,
   delOriginBranch,
+  checkTag,
 }
 
 module.exports = {

@@ -13,6 +13,7 @@ const {
   executeCMD,
   getCurrBranch,
 } = require('../../utils/gitUtil');
+const handleTag = require('./tag');
 
 // 默认步骤
 const defaultStep = [{
@@ -92,10 +93,11 @@ async function chooseSubOptions(filePath, options) {
     let targetBranch = currBranch; // 如果涉及到分支操作的目标分支
     const isSubBranch = branchRegx.test(steps[i]); // 当前步骤是否有分支操作
     let CMD = steps[i]; // 统一命令方法
-    const params = [filePath]; // 统一命令方法的参数 [文件路径, commit说明/分支]
+    let params = [filePath]; // 统一命令方法的参数 [文件路径, commit说明/分支]
     const isCommit = ['commit'].includes(steps[i]); // 当前步骤是否有commit操作，有的话会提示输入备注
     const isDelBranch = ['delBranch', 'delOriginBranch'].includes(steps[i]); // 当前步骤是否有删除分支操作，有的话会提示输入备注
     const isCreateBranch = ['branch', 'pushUpStream'].includes(steps[i]); // 当前步骤是否有创建分钟操作，有的话会提示输入备注
+    const isTag = ['tag', 'pushTag', 'delTag', 'delOriginTag'].includes(steps[i]);
     if (isCommit) {
       // commit操作
       const { commitMsg } = await inquirer.prompt([{
@@ -134,6 +136,10 @@ async function chooseSubOptions(filePath, options) {
       targetBranch = steps[i].match(branchRegx)[2]; // 如果是分支操作，则第二个参数为分支名称
       params.push(targetBranch);
       CMD = steps[i].match(branchRegx)[1]; // 如果是分支操作，则匹配出分支操作的正确方法名
+    }
+    if (isTag) {
+      // 标签步骤
+      params = await handleTag(steps[i], params);
     }
     await executeCMD(CMD, params, targetBranch);
     isCreateBranch && await askAddOriginBranch(params);
