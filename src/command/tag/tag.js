@@ -4,17 +4,16 @@ const {
   getDate,
   yellow,
   yellowBright,
-  execCMD,
   readFilesPath,
 } = require('../../utils/utils');
-const abnormal = require('../push/abnormal');
+const {
+  executeCMD,
+} = require('../../utils/gitUtil');
 
 // 获取已存在的tag
 async function getAlreadyTag(filePath) {
-  const result = await execCMD.CMD(filePath, 'git tag');
-  if (typeof result === 'object') {
-    process.exit(0);
-  }
+  const result = await executeCMD('checkTag', [filePath]);
+  if (!result) process.exit(0);
   const vList = result.split(/\n/);
   vList.pop();
   return vList;
@@ -138,10 +137,7 @@ async function chooseSubOptions(filePath, options, specParams) {
   const steps = options.split('-');
   const params = [filePath, ...specParams];
   for (let i = 0; i < steps.length; i += 1) {
-    const errObj = await execCMD[steps[i]](...params);
-    if (typeof errObj === 'object') {
-      await abnormal(errObj, params, filePath, '', steps[i]);
-    }
+    await executeCMD(steps[i], params);
   }
 }
 

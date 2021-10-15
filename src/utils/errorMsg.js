@@ -26,7 +26,7 @@ const errList = [{
 }, {
   msg: 'To push the current branch and set the remote as upstream',
   desc: '当前分支没有与远程仓库建立连接!',
-  value: 'errorOriginUrl',
+  value: 'notConnectOriginUrl',
   isReCMD: false,
 }, {
   msg: 'Timed out',
@@ -53,6 +53,11 @@ const errList = [{
   desc: 'commit描述格式错误',
   value: 'commitMsgErr',
   isReCMD: true,
+}, {
+  msg: 'already exists',
+  desc: '已经存在',
+  value: 'skip',
+  isReCMD: false,
 }];
 
 function errorMsg(msg) {

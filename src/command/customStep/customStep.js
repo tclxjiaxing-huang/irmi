@@ -52,6 +52,22 @@ const pushStepList = {
     name: '拉取代码(pull)',
     value: 'pull',
   },
+  tag: {
+    name: '打标签(tag)',
+    value: 'tag',
+  },
+  pushTag: {
+    name: '推送标签(pushTag)',
+    value: 'pushTag',
+  },
+  delTag: {
+    name: '删除标签(delTag)',
+    value: 'delTag',
+  },
+  delOriginTag: {
+    name: '删除远程标签(delOriginTag)',
+    value: 'delOriginTag',
+  },
   finish: {
     name: '完成',
     value: 'finish',

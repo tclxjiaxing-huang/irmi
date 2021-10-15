@@ -1,4 +1,3 @@
-
 const inquirer = require('inquirer');
 const {
   execCMD,
@@ -15,19 +14,6 @@ async function init(filePath) {
   await execCMD.branch(filePath, 'dev');
   await execCMD.branch(filePath, 'test');
   await execCMD.checkout(filePath, 'dev');
-}
-// 获取当前分支
-async function getCurrBranch(filePath) {
-  const result = await execCMD.status(filePath);
-  if (typeof result === 'object') {
-    return null;
-  }
-  const regx = /^On branch (.*)/;
-  const res = result.match(regx);
-  if (res) {
-    return res[1];
-  }
-  return 'dev';
 }
 // 配置远程仓库地址
 async function setOrigin(filePath) {
@@ -50,6 +36,5 @@ async function setOrigin(filePath) {
 
 module.exports = {
   init,
-  getCurrBranch,
   setOrigin,
 }
