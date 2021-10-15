@@ -39,6 +39,8 @@ async function errorOriginUrl(params) {
 }
 // 当前分支没有与远程分支建立连接
 async function notConnectOriginUrl(params) {
+  console.log(params);
+  process.exit(0);
   await execCMD.pushUpStream(...params);
 }
 // 初始化git项目
