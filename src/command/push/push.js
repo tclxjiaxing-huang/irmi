@@ -25,12 +25,6 @@ const defaultStep = [{
 },  {
   name: '提交代码->推送->合并到test->推送',
   value: 'add-commit-push-checkout(test)-merge(dev)-push-checkout(dev)',
-},  {
-  name: '删除分支',
-  value: 'delBranch',
-},  {
-  name: '创建分支',
-  value: 'branch',
 }];
 
 
@@ -160,7 +154,10 @@ async function getCustomStep() {
 }
 // 获取项目名称
 function getProjectName(filePath) {
-  return filePath.split('\\')[filePath.split('\\').length - 1];
+  if (filePath.indexOf(':') !== -1) {
+    return filePath.split('\\')[filePath.split('\\').length - 1];
+  }
+  return filePath.split('\/')[filePath.split('\/').length - 1];
 }
 // 选择应用
 async function chooseOptions() {
@@ -173,10 +170,14 @@ async function chooseOptions() {
   let { filesList } = await inquirer.prompt([{
     type: 'checkbox',
     name: 'filesList',
-    message: '选择应用(不选择则全部应用)',
+    message: '选择应用',
+    validate: (value) => {
+      if (value.length === 0) return '至少选择一个应用'
+      return true;
+    },
     choices: choices,
   }]);
-  if (!filesList) {
+  if (!filesList || (Array.isArray(filesList) && filesList.length === 0)) {
     filesList = filesData;
   }
   const { options } = await inquirer.prompt([{
