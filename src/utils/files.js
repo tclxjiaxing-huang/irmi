@@ -68,10 +68,17 @@ const readFilesPath = () => {
       yellow('暂无项目，请先添加');
       process.exit(0);
     }
-    return fileData.map((file) => ({
-      path: file.path,
-      name: file.name.split('\\')[file.name.split('\\').length - 1],
-    }));
+    return fileData.map((file) => {
+      let name = file.name;
+      if (name.indexOf(':') !== -1) {
+        name = name.split('\\')[name.split('\\').length - 1];
+      }
+      name = name.split('\/')[name.split('\/').length - 1];
+      return {
+        path: file.path,
+        name: name,
+      };
+    });
   } else {
     red('暂无配置项目，请先执行config添加项目');
     process.exit(0);
