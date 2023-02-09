@@ -1,4 +1,5 @@
-const chalk = require('chalk');
+const log = require('./log');
+
 class Spinner {
   constructor() {
     this.P = ["\\", "|", "/", "-"];
@@ -10,7 +11,7 @@ class Spinner {
     let x = 0;
     this.isSpinning = true;
     this.timer = await setInterval(async () => {
-      await this.stream.write(chalk.yellow(this.P[x++]) + chalk.yellow(text) + '\r');
+      await this.stream.write(log.tip(this.P[x++]) + log.tip(text) + '\r');
       if (x >= this.P.length) {
         x = 0;
       }
@@ -18,7 +19,7 @@ class Spinner {
   }
   async succeed(text) {
     await this.clear();
-    this.stream.write(chalk.green(`√${text}`) + '\n');
+    this.stream.write(log.success(`√${text}`) + '\n');
   }
   async clear() {
     this.clearTimer();
