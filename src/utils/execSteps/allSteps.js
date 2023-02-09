@@ -8,6 +8,7 @@ const allSteps = {
 	checkout,
 	add,
 	commit,
+	push,
 }
 async function checkout (filePath, branch) {
 	if (!branch) {
@@ -63,6 +64,15 @@ async function commit(filePath) {
 	try {
 		await execCMD.commit(filePath, commitMsg);
 		log.success('已提交！');
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+async function push(filePath) {
+	try {
+		await execCMD.push(filePath);
+		log.success("已推送到远程仓库!");
 	} catch (e) {
 		console.log(e);
 	}
