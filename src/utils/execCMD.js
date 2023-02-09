@@ -6,10 +6,12 @@ const {
   yellow,
   green,
 } = require('./log');
+const chalk = require("chalk");
 
 async function ExecCMD(path, execCode, afterTips = '', beforeTips = '') {
   return new Promise(async (resolve, reject) => {
     beforeTips && await spinner.start(beforeTips);
+    process.stdout.write('\n');
     exec(execCode, {
       cwd: path,
     }, async (err, stdout) => {
