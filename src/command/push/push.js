@@ -4,7 +4,8 @@ const {
   getStepData,
   getProjectData,
   execCMD,
-  tempStepFile,
+  allSteps,
+  execSteps,
 } = require('../../utils');
 const {
   checkOriginBranch,
@@ -18,7 +19,7 @@ const handleTag = require('./tag');
 // 默认步骤
 const defaultStep = [{
   name: '提交代码',
-  value: 'checkout<dev>-add-commit',
+  value: 'checkout<dev>',
 }, {
   name: '提交代码->推送',
   value: 'add-commit-push',
@@ -147,48 +148,23 @@ async function chooseSubOptions(filePath, stepStr) {
   }
 }
 
-const promptOption = {
-  commit: {
-    type: 'input',
-    name: 'commitMsg',
-    message: '请输入commit说明',
-    default: '提交',
-  },
-  checkout: {
-    type: 'input',
-    name: 'branch',
-    message: '请选择分支',
-    default: 'dev',
-  }
-}
-
 // 执行步骤
 async function chooseSubOptions2(filePath, stepStr) {
-  const steps = stepStr.split('-'); // 所有步骤
-  for (let i = 0; i < steps.length; i += 1) {
-    let promptData = [];
-    const step = steps[i];
-    if (promptOption[step]) {
-      const res = await inquirer.prompt([promptOption[step]]);
-      promptData = Object.values(res);
-    }
-    if (execCMD[step]) {
-      execCMD[step](filePath, ...promptData);
-    }
-  }
+  await execSteps(filePath, stepStr);
+  // const steps = stepStr.split('-'); // 所有步骤
+  // const matchName = /^([a-zA-Z]+)(?:<([\w,]+)>)?/;
+  // for (let i = 0; i < steps.length; i += 1) {
+  //   const step = steps[i];
+  //   if (matchName.test(step)) {
+  //     let [, stepName, args] = step.match(matchName);
+  //     args = args ? args.split(',') : [];
+  //     if (allSteps[stepName] instanceof Function) {
+  //       await allSteps[stepName](filePath, ...args);
+  //     }
+  //   }
+  // }
 }
 
-// 读取缓存中的自定义步骤
-async function getCustomStep() {
-  const res = await JSON.parse(readTempData(tempStepFile));
-  if (res && res.push) {
-    return res.push.map((item) => ({
-      name: item.label,
-      value: item.value,
-    }));
-  }
-  return [];
-}
 // 获取项目名称
 function getProjectName(filePath) {
   if (filePath.indexOf(':') !== -1) {
@@ -200,7 +176,7 @@ function getProjectName(filePath) {
 async function chooseProject() {
   const filesData = getProjectData();
   if (filesData.length === 0) {
-    log.yellow('暂未配置任何项目，请先进行配置！');
+    log.warning('暂未配置任何项目，请先进行配置！');
     process.exit(0);
   }
   const choices = filesData.map((file) => ({
@@ -234,8 +210,8 @@ async function chooseStep(projectList) {
   }]);
   for (let i = 0; i < projectList.length; i += 1) {
     // await checkoutDev(projectList[i]);
-    log.yellowBright(`***当前应用[${getProjectName(projectList[i])}]***`);
-    log.yellowBright(`***当前步骤[${stepStr}]***`);
+    log.tip(`当前应用[${getProjectName(projectList[i])}]`);
+    log.tip(`当前步骤[${stepStr}`);
     await chooseSubOptions2(projectList[i], stepStr);
   }
 }

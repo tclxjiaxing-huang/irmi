@@ -8,22 +8,25 @@ const {
 } = require('./log');
 
 async function ExecCMD(path, execCode, afterTips = '', beforeTips = '') {
-  return new Promise(async (resolve) => {
-    beforeTips && await spinner.start(beforeTips);
+  return new Promise(async (resolve, reject) => {
+    // beforeTips && await spinner.start(beforeTips);
+    await spinner.start();
     exec(execCode, {
       cwd: path,
     }, async (err, stdout) => {
       spinner.isSpinning && await spinner.clear();
       if (err) {
-        const errObj = errorMsg(JSON.stringify(err.message));
-        errObj && yellow(`提示: ${errObj.desc}`);
-        !errObj && red(`error: ${err}`);
-        errObj && errObj.value && resolve(errObj);
-        return;
-      };
-      afterTips && await spinner.succeed(afterTips);
-      // afterTips && green(afterTips);
-      resolve(stdout);
+        reject(err);
+        // const errObj = errorMsg(JSON.stringify(err.message));
+        // errObj && yellow(`提示: ${errObj.desc}`);
+        // !errObj && red(`error: ${err}`);
+        // errObj && errObj.value && resolve(errObj);
+        // return;
+      } else {
+        // afterTips && await spinner.succeed(afterTips);
+        // afterTips && green(afterTips);
+        resolve(stdout);
+      }
     });
   });
 }

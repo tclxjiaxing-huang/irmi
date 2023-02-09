@@ -9,6 +9,11 @@ const green = consoleLog(chalk.green);
 const red = consoleLog(chalk.red);
 const gray = consoleLog(chalk.gray);
 const log = {
+  success: green,
+  tip: (msg) => yellow(`***${msg}***`),
+  text: gray,
+  warning: yellowBright,
+  error: red,
   gray,
   red,
   green,

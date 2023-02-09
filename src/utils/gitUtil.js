@@ -1,6 +1,4 @@
-const {
-  execCMD,
-} = require('./execCMD');
+const execCMD = require('./execCMD');
 const abnormal = require('./abnormal');
 
 // 获取所有分支
@@ -47,6 +45,7 @@ async function executeCMD(CMD, params, targetBranch = '') {
   })();
   return result;
 }
+
 // 获取当前分支
 async function getCurrBranch(filePath) {
   const result = await execCMD.status(filePath);
