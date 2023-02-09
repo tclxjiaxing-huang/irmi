@@ -70,12 +70,8 @@ async function isWorkClear(filePath) {
   return false;
 }
 async function isAllClear(filePath) {
-  const result = await execCMD.status(filePath);
-  if (!~result.indexOf('nothing to commit, working tree clean')) {
-    // 说明工作区和暂存区干净
-    return true;
-  }
-  return false;
+  const data = await Promise.all([isWorkClear(filePath), isTempClear(filePath)]);
+  return data.every((item) => item);
 }
 
 // 获取已存在的tag

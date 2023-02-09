@@ -205,11 +205,33 @@ async function pull(filePath, rebase) {
 }
 
 async function push(filePath) {
-	const isClear = await gitUtil.isAllClear();
-	if (isClear) {
+	let tempClear = await gitUtil.isTempClear();
+	const workClear = await gitUtil.isWorkClear();
+	if (tempClear && workClear) {
 		// 若暂存区工作区干净，则无需push
 		log.text("暂存区和工作区干净，跳过push。");
 		return;
+	}
+	if (!workClear) {
+		const { isAdd } = await inquirer.prompt([{
+			type: 'confirm',
+			name: 'isAdd',
+			message: '工作区存在未add代码，是否add',
+		}]);
+		if (isAdd) {
+			await add(filePath);
+			tempClear = false;
+		}
+	}
+	if (!tempClear) {
+		const { isCommit } = await inquirer.prompt([{
+			type: 'confirm',
+			name: 'isCommit',
+			message: '暂存区存在未commit代码，是否commit',
+		}]);
+		if (isCommit) {
+			await commit(filePath);
+		}
 	}
 	try {
 		await execCMD.push(filePath);

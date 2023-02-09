@@ -86,7 +86,7 @@ const errMsgMap = [
 	},
 	{
 		msg: "fatal: Not possible to fast-forward, aborting.",
-		desc: "拉取错误",
+		desc: "拉取错误，将执行git pull --rebase操作",
 		handleFunction: pullFail,
 	},
 	{
