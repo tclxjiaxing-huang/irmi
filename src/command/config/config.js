@@ -6,8 +6,8 @@ const {
   projectFileName,
 } = require('../../utils');
 
-const filePathRegx = /^[A-Z]:(\\{1,2}[\d\w-]+)+$/; // window
-const filePathRegx2 = /^(\/[\d\w-]+)+$/; // mac
+const filePathRegx = /^[A-Z]:(\\{1,2}[\u4e00-\u9fa5\w-]+)+$/; // window
+const filePathRegx2 = /^(\/[\u4e00-\u9fa5\w-]+)+$/; // mac
 
 function config(filePath, options) {
   if (options.del) {

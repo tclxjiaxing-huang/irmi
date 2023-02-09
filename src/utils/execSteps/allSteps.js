@@ -9,10 +9,11 @@ const allSteps = {
 	add,
 	commit,
 	push,
+	branch,
 }
 async function checkout (filePath, branch) {
+	const allLocalBranchs = await gitUtil.getAllBranch(filePath);
 	if (!branch) {
-		const allLocalBranchs = await gitUtil.getAllBranch(filePath);
 		// 若不存在，则需要选择切换分支
 		const res = await inquirer.prompt([{
 			type: 'list',
@@ -27,10 +28,22 @@ async function checkout (filePath, branch) {
 		log.text(`已处于${branch}分支`);
 		return;
 	}
+	if (!allLocalBranchs.includes(branch)) {
+		// 说明切换的分支不存在
+		const {isCreateBranch} = await inquirer.prompt([{
+			type: 'confirm',
+			name: 'isCreateBranch',
+			message: `${branch}分支不存在，是否要创建`,
+		}]);
+		if (isCreateBranch) {
+			await allSteps.branch(filePath, branch);
+		}
+	}
 	try {
 		await execCMD.checkout(filePath, branch);
 		log.success(`已切换到${branch}分支`);
 	} catch (e) {
+		console.log(e.message);
 		const stepStr = await handleError(e.message);
 		if (stepStr) {
 			// 说明有其他步骤要走
@@ -40,6 +53,19 @@ async function checkout (filePath, branch) {
 		}
 	}
 };
+
+async function branch(filePath, branchName, tagName) {
+	try {
+		await execCMD.branch(filePath, branchName, tagName);
+		if (tagName) {
+			log.success(`已从tag${tagName}中创建${branchName}新分支!`);
+		} else {
+			log.success(`创建${branchName}分支成功!`);
+		}
+	} catch (e) {
+		console.log(e);
+	}
+}
 
 async function add(filePath) {
 	try {
@@ -51,6 +77,12 @@ async function add(filePath) {
 }
 
 async function commit(filePath) {
+	try {
+		const res = await execCMD.status(filePath);
+		log.success(res);
+	} catch (e) {
+		log.red(e);
+	}
 	// 输入描述
 	const { commitMsg } = await inquirer.prompt([{
 		type: 'input',
@@ -65,7 +97,13 @@ async function commit(filePath) {
 		await execCMD.commit(filePath, commitMsg);
 		log.success('已提交！');
 	} catch (e) {
-		console.log(e);
+		const stepStr = await handleError(e.message);
+		if (stepStr) {
+			// 说明有其他步骤要走
+			await execSteps(filePath, stepStr);
+			// 完成后再次执行当前函数
+			await commit(filePath);
+		}
 	}
 }
 

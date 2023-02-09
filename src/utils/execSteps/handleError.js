@@ -21,14 +21,19 @@ const errMsgMap = [
 		handleFunction: changeBeforeSwitch,
 	},
 	{
-		msg: "Aborting commit due to empty commit message.",
+		msg: "Command failed: git commit -m",
+		desc: "暂存区没有修改，不需要描述信息",
 	}
 ];
 async function handleError(errMsg, ...args) {
 	const find = errMsgMap.find((item) => ~errMsg.indexOf(item.msg));
 	if (find) {
-		log.warning(find.desc);
-		return find.handleFunction(...args);
+		find.desc && log.warning(find.desc);
+		if (find.handleFunction instanceof Function) {
+			return find.handleFunction(...args);
+		}
+	} else {
+		log.red(errMsg);
 	}
 }
 

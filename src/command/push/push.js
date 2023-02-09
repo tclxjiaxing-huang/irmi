@@ -4,7 +4,6 @@ const {
   getStepData,
   getProjectData,
   execCMD,
-  allSteps,
   execSteps,
 } = require('../../utils');
 const {
@@ -19,7 +18,7 @@ const handleTag = require('./tag');
 // 默认步骤
 const defaultStep = [{
   name: '提交代码',
-  value: 'checkout<dev>-add-commit-push',
+  value: 'checkout<dev>-commit',
 }, {
   name: '提交代码->推送',
   value: 'add-commit-push',

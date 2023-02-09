@@ -11,7 +11,7 @@ function showProject() {
   if (!filesData.length) {
     log.yellow('***暂未配置任何项目***');
   } else {
-    log.yellow('***当前项目***');
+    log.yellow('***已配置项目***');
     for (let i = 0; i < filesData.length; i += 1) {
       log.yellowBright(`${filesData[i].name}`)
     }
