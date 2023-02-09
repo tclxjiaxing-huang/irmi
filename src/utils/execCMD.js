@@ -14,7 +14,7 @@ async function ExecCMD(path, execCode, afterTips = '', beforeTips = '') {
     exec(execCode, {
       cwd: path,
     }, async (err, stdout) => {
-      spinner.isSpinning && await spinner.clear();
+      // spinner.isSpinning && await spinner.clear();
       if (err) {
         reject(err);
         // const errObj = errorMsg(JSON.stringify(err.message));
