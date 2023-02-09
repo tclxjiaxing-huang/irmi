@@ -1,4 +1,5 @@
 const chalk = require('chalk');
+
 class Spinner {
   constructor() {
     this.P = ["\\", "|", "/", "-"];

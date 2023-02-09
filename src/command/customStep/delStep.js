@@ -1,57 +1,38 @@
 const inquirer = require('inquirer');
 const {
-  readTempData,
-  writeTempData,
-  tempStepFile,
-  red,
-  green,
-} = require('../../utils/utils');
-
-async function delPush() {
-  const step = await JSON.parse(readTempData(tempStepFile));
-  if (step && Array.isArray(step.push) && step.push.length > 0) {
-    const { push } = step;
-    const { stepList } = await inquirer.prompt([{
-      type: 'checkbox',
-      name: 'stepList',
-      message: '选择要删除步骤',
-      choices: push.map((item) => ({
-        name: item.label,
-        value: item.value,
-      })),
-    }]);
-    for (let i = 0; i < push.length; i += 1) {
-      for (let j = 0; j < stepList.length; j += 1) {
-        if (push[i].value === stepList[j]) {
-          push.splice(i, 1);
-          i--;
-          break;
-        }
-      }
-    }
-    step.push = push;
-    await writeTempData(tempStepFile, step);
-    green('***删除步骤成功***');
-  } else {
-    red('暂无自定义的推送步骤');
-  }
-}
+  log,
+  getStepData,
+  writeDataToHomeDir,
+  stepFileName,
+} = require('../../utils/index');
 
 async function delStep() {
-  const { type } = await inquirer.prompt([{
-    type: 'list',
-    name: 'type',
-    choices: [{
-      name: '推送步骤',
-      value: 'push'
-    }, {
-      name: '打标签步骤',
-      value: 'tag'
-    }],
-  }]);
-  if (type === 'push') {
-    await delPush();
+  const stepData = await getStepData();
+  if (!stepData.length) {
+    log.warning("没有配置自定义步骤。");
+    return;
   }
+  const { delSteps } = await inquirer.prompt([{
+    type: 'checkbox',
+    name: 'delSteps',
+    message: '请选择要删除步骤',
+    validate: (value) => {
+      if (value.length === 0) return '至少选择一个步骤'
+      return true;
+    },
+    choices: stepData.map((step) => ({
+      name: step.name,
+      value: step.name,
+    })),
+  }]);
+  delSteps.forEach((delStep) => {
+    const findIndex = stepData.findIndex((step) => step.name === delStep);
+    if (~findIndex) {
+      stepData.splice(findIndex, 1);
+    }
+  });
+  await writeDataToHomeDir(stepFileName, stepData);
+  log.success(`删除${delSteps.join(',')}步骤成功`);
 }
 
 module.exports = delStep;

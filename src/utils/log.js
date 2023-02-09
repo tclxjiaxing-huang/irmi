@@ -1,15 +1,19 @@
 const chalk = require('chalk');
 
-const log = (colorLog) => {
+const consoleLog = (colorLog) => {
   return (...rest) => console.log(colorLog(...rest));
 }
-const yellow = log(chalk.yellow);
-const yellowBright = log(chalk.yellowBright);
-const green = log(chalk.green);
-const red = log(chalk.red);
-const gray = log(chalk.gray);
-
-module.exports = {
+const yellow = consoleLog(chalk.yellow);
+const yellowBright = consoleLog(chalk.yellowBright);
+const green = consoleLog(chalk.green);
+const red = consoleLog(chalk.red);
+const gray = consoleLog(chalk.gray);
+const log = {
+  success: green,
+  tip: yellow,
+  text: gray,
+  warning: yellowBright,
+  error: red,
   gray,
   red,
   green,
@@ -17,3 +21,5 @@ module.exports = {
   yellowBright,
   chalk,
 }
+
+module.exports = log;

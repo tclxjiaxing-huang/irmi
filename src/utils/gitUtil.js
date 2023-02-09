@@ -1,7 +1,4 @@
-const {
-  execCMD,
-} = require('./CMD');
-const abnormal = require('./abnormal');
+const execCMD = require('./execCMD');
 
 // 获取所有分支
 async function getAllBranch(filePath, isRemote = false) {
@@ -34,19 +31,14 @@ async function checkOriginBranch(filePath, targetBranch) {
 }
 
 // 执行命令
-async function executeCMD(CMD, params, targetBranch = '') {
+async function executeCMD(CMD, params) {
   let result = '';
   await (async function execute() {
-    const errObj = await execCMD[CMD](...params);
-    if (typeof errObj === 'object') {
-      await abnormal(errObj, params, targetBranch, CMD);
-      errObj.isReCMD && await execute();
-    } else {
-      result = errObj;
-    }
+    result = await execCMD[CMD](...params);
   })();
   return result;
 }
+
 // 获取当前分支
 async function getCurrBranch(filePath) {
   const result = await execCMD.status(filePath);
@@ -61,6 +53,23 @@ async function getCurrBranch(filePath) {
   return 'dev';
 }
 
+async function isTempClear(filePath) {
+  const result = await execCMD.status(filePath);
+  if (!~result.indexOf('Changes to be committed')) {
+    // 说明暂存区是干净的
+    return true;
+  }
+  return false;
+}
+async function isWorkClear(filePath) {
+  const result = await execCMD.status(filePath);
+  if (!~result.indexOf('Changes not staged for commit')) {
+    // 说明工作区干净
+    return true;
+  }
+  return false;
+}
+
 // 获取已存在的tag
 async function getAlreadyTag(filePath) {
   const result = await executeCMD('checkTag', [filePath]);
@@ -71,6 +80,8 @@ async function getAlreadyTag(filePath) {
 }
 
 module.exports = {
+  isTempClear,
+  isWorkClear,
   checkRemote,
   checkOriginBranch,
   getAllBranch,
