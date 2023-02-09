@@ -10,11 +10,11 @@ const chalk = require("chalk");
 
 async function ExecCMD(path, execCode, afterTips = '', beforeTips = '') {
   return new Promise(async (resolve, reject) => {
-    // beforeTips && await spinner.start(beforeTips);
+    beforeTips && await spinner.start(beforeTips);
     exec(execCode, {
       cwd: path,
     }, async (err, stdout) => {
-      // spinner.isSpinning && await spinner.clear();
+      spinner.isSpinning && await spinner.clear();
       if (err) {
         reject(err);
         // const errObj = errorMsg(JSON.stringify(err.message));
