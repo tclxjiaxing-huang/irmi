@@ -34,6 +34,8 @@ async function checkout (filePath, branch) {
 		if (stepStr) {
 			// 说明有其他步骤要走
 			await execSteps(filePath, stepStr);
+			// 完成后再次执行当前函数
+			await checkout(filePath, branch);
 		}
 	}
 };
