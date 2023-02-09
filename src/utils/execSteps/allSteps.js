@@ -10,51 +10,70 @@ const allSteps = {
 	commit,
 	push,
 	branch,
+	branchTag,
+	tag,
+	delBranch,
+	delOriginBranch,
+	delTag,
+	merge,
 }
-async function checkout (filePath, branch) {
+async function checkout (filePath, branchName) {
 	const allLocalBranchs = await gitUtil.getAllBranch(filePath);
-	if (!branch) {
+	if (!branchName) {
 		// 若不存在，则需要选择切换分支
-		const res = await inquirer.prompt([{
+		const { newBranchName } = await inquirer.prompt([{
 			type: 'list',
-			name: 'branch',
-			message: '请选择分支',
+			name: 'newBranchName',
+			message: '请选择需要切换分支',
 			choices: allLocalBranchs,
 		}]);
-		branch = res.branch;
+		branchName = newBranchName;
 	}
 	const nowBranch = await gitUtil.getCurrBranch(filePath);
-	if (nowBranch === branch) {
-		log.text(`已处于${branch}分支`);
+	if (nowBranch === branchName) {
+		log.text(`已处于${branchName}分支`);
 		return;
 	}
-	if (!allLocalBranchs.includes(branch)) {
+	if (!allLocalBranchs.includes(branchName)) {
 		// 说明切换的分支不存在
 		const {isCreateBranch} = await inquirer.prompt([{
 			type: 'confirm',
 			name: 'isCreateBranch',
-			message: `${branch}分支不存在，是否要创建`,
+			message: `${branchName}分支不存在，是否要创建`,
 		}]);
 		if (isCreateBranch) {
-			await allSteps.branch(filePath, branch);
+			await allSteps.branch(filePath, branchName);
 		}
 	}
 	try {
-		await execCMD.checkout(filePath, branch);
-		log.success(`已切换到${branch}分支`);
+		await execCMD.checkout(filePath, branchName);
+		log.success(`已切换到${branchName}分支`);
 	} catch (e) {
-		console.log(e.message);
 		const stepStr = await handleError(e.message);
 		if (stepStr) {
 			// 说明有其他步骤要走
 			await execSteps(filePath, stepStr);
 			// 完成后再次执行当前函数
-			await checkout(filePath, branch);
+			await checkout(filePath, branchName);
 		}
 	}
 };
 
 async function branch(filePath, branchName, tagName) {
+	if (!branchName) {
+		// 若不存在，则需要输入分支名称
+		const { newBranch } = await inquirer.prompt([{
+			type: 'input',
+			name: 'newBranch',
+			message: '请输入新分支名称',
+		}]);
+		branchName = newBranch;
+	}
+	const allLocalBranchs = await gitUtil.getAllBranch(filePath);
+	if (allLocalBranchs.includes(branchName)) {
+		log.error(`已存在名称为${branchName}的分支`);
+		return;
+	}
 	try {
 		await execCMD.branch(filePath, branchName, tagName);
 		if (tagName) {
@@ -63,21 +82,79 @@ async function branch(filePath, branchName, tagName) {
 			log.success(`创建${branchName}分支成功!`);
 		}
 	} catch (e) {
-		console.log(e);
+		await handleError(e.message);
+	}
+}
+
+async function branchTag(filePath, branchName, tagName) {
+	if (!tagName) {
+		// 若不存在，则需要选择目标tag
+		const allTag = await gitUtil.getAlreadyTag();
+		const { newTagName } = await inquirer.prompt([{
+			type: 'list',
+			name: 'newTagName',
+			message: '请选择需要目标标签',
+			choices: allTag,
+		}]);
+		tagName = newTagName;
+	}
+	await branch(filePath, branchName, tagName);
+}
+
+async function delBranch(filePath, branchName) {
+	const allLocalBranchs = await gitUtil.getAllBranch(filePath);
+	if (!branchName) {
+		// 若不存在，则需要选择删除分支
+		const res = await inquirer.prompt([{
+			type: 'list',
+			name: 'branch',
+			message: '请选择需要删除分支',
+			choices: allLocalBranchs,
+		}]);
+		branch = res.branch;
+	}
+	try {
+		if (!allLocalBranchs.includes(branchName)) {
+			log.error(`${branchName}分支不存在，跳过当前步骤!`);
+			return;
+		}
+		await execCMD.delBranch(filePath, branchName);
+		log.success(`删除${branchName}分支成功!`);
+	} catch (e) {
+		await handleError(e.message);
+	}
+}
+
+async function delOriginBranch(filePath, branchName) {
+	if (!branchName) {
+		// 若不存在，则需要选择删除分支
+		const { newBranch } = await inquirer.prompt([{
+			type: 'input',
+			name: 'newBranch',
+			message: '输入远程分支名称',
+		}]);
+		branchName = newBranch;
+	}
+	try {
+		await execCMD.delOriginBranch(filePath, branchName);
+		log.success(`删除远程${branchName}分支成功!`);
+	} catch (e) {
+		await handleError(e.message);
 	}
 }
 
 async function add(filePath) {
 	const isClear = await gitUtil.isWorkClear();
 	if (isClear) {
-		// 若工作区区干净，则无需add
+		// 若工作区干净，则无需add
+		log.text("工作区干净，跳过add。");
 		return;
 	}
 	try {
 		await execCMD.add(filePath);
 		log.success('已添加到暂存区！');
 	} catch (e) {
-		console.log(e);
+		await handleError(e.message);
 	}
 }
 
@@ -85,6 +162,7 @@ async function commit(filePath) {
 	const isClear = await gitUtil.isTempClear();
 	if (isClear) {
 		// 若暂存区干净，则无需commit
+		log.text("暂存区干净，跳过commit。");
 		return;
 	}
 	// 输入描述
@@ -116,7 +194,93 @@ async function push(filePath) {
 		await execCMD.push(filePath);
 		log.success("已推送到远程仓库!");
 	} catch (e) {
-		console.log(e);
+		await handleError(e.message);
+	}
+}
+
+async function merge(filePath, branch) {
+	const allLocalBranchs = await gitUtil.getAllBranch(filePath);
+	const nowBranch = await gitUtil.getCurrBranch(filePath);
+	if (!branch) {
+		// 若不存在，则需要选择合并分支
+		const res = await inquirer.prompt([{
+			type: 'list',
+			name: 'branch',
+			message: '请选择需要合并的分支',
+			choices: allLocalBranchs.filter((item) => item !== nowBranch),
+		}]);
+		branch = res.branch;
+	}
+	if (!branch || !allLocalBranchs.includes(branch)) {
+		// 说明合并的分支不存在，跳过
+		log.error('没有目标分支，跳过当前步骤。');
+		return;
+	}
+	try {
+		await execCMD.merge(filePath, branch);
+		log.success(`已将${branch}分支合并到当前分支(${nowBranch})`);
+	} catch (e) {
+		const stepStr = await handleError(e.message);
+		if (stepStr) {
+			// 说明有其他步骤要走
+			await execSteps(filePath, stepStr);
+			// 完成后再次执行当前函数
+			await merge(filePath, branch);
+		}
+	}
+}
+
+async function tag(filePath, tagName, tagDesc) {
+	if (!tagName) {
+		// 若不存在，则需要输入分支名称
+		const { newTag } = await inquirer.prompt([{
+			type: 'input',
+			name: 'newTag',
+			message: '请输入新标签名称',
+			validate: (value) => {
+				if (value.length === 0) return '标签名称不能为空'
+				return true;
+			},
+		}]);
+		tagName = newTag;
+	}
+	if (!tagDesc) {
+		// 若不存在，则需要输入标签描述
+		const { newTagDesc } = await inquirer.prompt([{
+			type: 'input',
+			name: 'newTagDesc',
+			message: '请输入新标签描述(回车可跳过)',
+		}]);
+		tagDesc = newTagDesc;
+	}
+	try {
+		await execCMD.tag(filePath, tagName, tagDesc);
+	} catch (e) {
+		await handleError(e.message);
+	}
+}
+
+async function delTag(filePath, tagName) {
+	if (!tagName) {
+		// 若不存在，则需要输入标签名称
+		const allTag = await gitUtil.getAlreadyTag();
+		const { newTag } = await inquirer.prompt([{
+			type: 'list',
+			name: 'newTag',
+			message: '请选择要删除的标签',
+			validate: (value) => {
+				if (value.length === 0) return '需至少选择一个标签';
+				return true;
+			},
+			choices: allTag,
+		}]);
+		tagName = newTag;
+	}
+	try {
+		await execCMD.delTag(filePath, tagName);
+		log.success(`删除${tagName}成功!`);
+	} catch (e) {
+		await handleError(e.message);
 	}
 }
 

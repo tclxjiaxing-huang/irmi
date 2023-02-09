@@ -1,12 +1,5 @@
 const { exec } = require('child_process');
 const spinner = require('./spinner');
-const errorMsg = require('./errorMsg');
-const {
-  red,
-  yellow,
-  green,
-} = require('./log');
-const chalk = require("chalk");
 
 async function ExecCMD(path, execCode, afterTips = '', beforeTips = '') {
   return new Promise(async (resolve, reject) => {
@@ -17,14 +10,7 @@ async function ExecCMD(path, execCode, afterTips = '', beforeTips = '') {
       spinner.isSpinning && await spinner.clear();
       if (err) {
         reject(err);
-        // const errObj = errorMsg(JSON.stringify(err.message));
-        // errObj && yellow(`提示: ${errObj.desc}`);
-        // !errObj && red(`error: ${err}`);
-        // errObj && errObj.value && resolve(errObj);
-        // return;
       } else {
-        // afterTips && await spinner.succeed(afterTips);
-        // afterTips && green(afterTips);
         resolve(stdout);
       }
     });

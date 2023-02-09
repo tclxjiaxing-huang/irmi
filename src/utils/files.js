@@ -64,7 +64,7 @@ const getProjectData = () => {
 };
 
 // 读取保存的步骤数据
-const getStepData = (type = 'push') => {
+const getStepData = (type) => {
   const stepDirPath = resolve(os.homedir(), irmiDirName);
   const stepFile = resolve(stepDirPath, stepFileName);
   if (isFileExist(stepFile)) {
@@ -72,6 +72,7 @@ const getStepData = (type = 'push') => {
     if (type && stepData[type]) {
       return stepData[type];
     }
+    return stepData;
   }
   return [];
 }
@@ -112,4 +113,5 @@ module.exports = {
   getProjectData,
   getStepData,
   projectFileName,
+  stepFileName,
 }

@@ -1,5 +1,4 @@
 const execCMD = require('./execCMD');
-const abnormal = require('./abnormal');
 
 // 获取所有分支
 async function getAllBranch(filePath, isRemote = false) {
@@ -32,16 +31,10 @@ async function checkOriginBranch(filePath, targetBranch) {
 }
 
 // 执行命令
-async function executeCMD(CMD, params, targetBranch = '') {
+async function executeCMD(CMD, params) {
   let result = '';
   await (async function execute() {
-    const errObj = await execCMD[CMD](...params);
-    if (typeof errObj === 'object') {
-      await abnormal(errObj, params, targetBranch, CMD);
-      errObj.isReCMD && await execute();
-    } else {
-      result = errObj;
-    }
+    result = await execCMD[CMD](...params);
   })();
   return result;
 }
