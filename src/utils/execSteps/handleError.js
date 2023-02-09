@@ -38,6 +38,22 @@ async function pushFail() {
 	process.exit(0);
 }
 
+async function timeOut() {
+	const { isReDo } = await inquirer.prompt([{
+		type: 'confirm',
+		name: 'isReDo',
+		message: '操作超时，是否重拾',
+	}]);
+	if (isReDo) {
+		return "reExec";
+	}
+	process.exit(0);
+}
+
+async function pullFail() {
+	return 'pull<rebase>';
+}
+
 const errMsgMap = [
 	{
 		msg: "Please commit your changes or stash them before you switch branches.",
@@ -59,9 +75,24 @@ const errMsgMap = [
 		handleFunction: fixConflict,
 	},
 	{
-		msg: "(e.g., 'git pull ...') before pushing again.",
+		msg: "error: failed to push some refs to",
 		desc: "推送失败",
 		handleFunction: pushFail,
+	},
+	{
+		msg: "Operation timed out",
+		desc: "网络错误，操作超时",
+		handleFunction: timeOut,
+	},
+	{
+		msg: "fatal: Not possible to fast-forward, aborting.",
+		desc: "拉取错误",
+		handleFunction: pullFail,
+	},
+	{
+		msg: "error: please commit or stash them.",
+		desc: "存在未提交到代码",
+		handleFunction: changeBeforeSwitch,
 	}
 ];
 async function handleError(errMsg, ...args) {

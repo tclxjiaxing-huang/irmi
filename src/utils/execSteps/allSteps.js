@@ -190,12 +190,17 @@ async function commit(filePath) {
 	}
 }
 
-async function pull(filePath) {
+async function pull(filePath, rebase) {
 	try {
-		await execCMD.pull(filePath);
+		await execCMD.pull(filePath, rebase ? '--rebase' : '');
 		log.success("已从远程仓库更新!");
 	} catch (e) {
-		await handleError(e.message);
+		const stepStr = await handleError(e.message);
+		if (stepStr) {
+			// 说明有其他步骤要走
+			await execSteps(filePath, stepStr);
+			await pull(filePath);
+		}
 	}
 }
 

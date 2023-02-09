@@ -50,7 +50,7 @@ program
   .description('内置常用git操作')
   .option('-a --add','添加到暂存区')
   .option('-c --commit','提交代码')
-  .option('-p --push','推送')
+  .option('-p --push','推送到远程仓库')
   .option('-b --branch','创建分支')
   .option('-bt --branchTag','从指定tag创建分支')
   .option('-t --tag','打标签')

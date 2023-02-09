@@ -44,6 +44,9 @@ checkout<dev>-add-commit-push-checkout<test>-merge<dev>-push-checkout<dev>
 ````
 irmi git -d
 ````
+`-a`: 添加到暂存区  
+`-c`: 提交代码
+`-p`: 推送到远程仓库
 `-b`: 创建分支  
 `-bt`: 从指定tag创建分支  
 `-t`: 打标签  
@@ -51,6 +54,6 @@ irmi git -d
 `-do`: 删除远程分支  
 `-dt`: 打标签  
 `-dto`: 打标签  
-`-c`: 切换分支  
+`-ck`: 切换分支  
 `-m`: 合并分支  
 
