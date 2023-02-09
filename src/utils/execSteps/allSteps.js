@@ -190,6 +190,12 @@ async function commit(filePath) {
 }
 
 async function push(filePath) {
+	const isClear = await gitUtil.isAllClear();
+	if (isClear) {
+		// 若暂存区工作区干净，则无需push
+		log.text("暂存区和工作区干净，跳过push。");
+		return;
+	}
 	try {
 		await execCMD.push(filePath);
 		log.success("已推送到远程仓库!");
