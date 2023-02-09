@@ -11,8 +11,7 @@ class Spinner {
     let x = 0;
     this.isSpinning = true;
     this.timer = await setInterval(async () => {
-      await log.tip(this.P[x++], text);
-      await this.stream.write('\r');
+      this.stream.write(log.tip(this.P[x++], text) + '\r')
       if (x >= this.P.length) {
         x = 0;
       }
