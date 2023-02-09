@@ -21,7 +21,7 @@ async function fixConflict() {
 		message: '是否已经解决冲突',
 	}]);
 	if (isfix) {
-		return;
+		return 'add-commit';
 	}
 	process.exit(0);
 }
