@@ -26,6 +26,18 @@ async function fixConflict() {
 	process.exit(0);
 }
 
+async function pushFail() {
+	const { isPull } = await inquirer.prompt([{
+		type: 'confirm',
+		name: 'isPull',
+		message: '推送失败，远程和本地不一致，是否执行pull操作',
+	}]);
+	if (isPull) {
+		return "pull";
+	}
+	process.exit(0);
+}
+
 const errMsgMap = [
 	{
 		msg: "Please commit your changes or stash them before you switch branches.",
@@ -45,6 +57,11 @@ const errMsgMap = [
 		msg: "fatal: Exiting because of an unresolved conflict",
 		desc: "存在未解决的冲突，请新开终端窗口进行解决",
 		handleFunction: fixConflict,
+	},
+	{
+		msg: "(e.g., 'git pull ...') before pushing again.",
+		desc: "推送失败",
+		handleFunction: pushFail,
 	}
 ];
 async function handleError(errMsg, ...args) {
