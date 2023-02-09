@@ -69,10 +69,10 @@ async function isWorkClear(filePath) {
   }
   return false;
 }
-async function isAllClear(filePath) {
+async function isNeedPush(filePath) {
   const result = await execCMD.status(filePath);
-  if (!~result.indexOf('nothing to commit, working tree clean')) {
-    // 说明工作区和暂存区干净
+  if (~result.indexOf('use "git push" to publish your local commits')) {
+    // 说明需要push
     return true;
   }
   return false;
@@ -90,7 +90,7 @@ async function getAlreadyTag(filePath) {
 module.exports = {
   isTempClear,
   isWorkClear,
-  isAllClear,
+  isNeedPush,
   checkRemote,
   checkOriginBranch,
   getAllBranch,

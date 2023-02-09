@@ -190,19 +190,46 @@ async function commit(filePath) {
 	}
 }
 
-async function pull(filePath) {
+async function pull(filePath, rebase) {
 	try {
-		await execCMD.pull(filePath);
+		await execCMD.pull(filePath, rebase ? '--rebase' : '');
 		log.success("已从远程仓库更新!");
 	} catch (e) {
-		await handleError(e.message);
+		const stepStr = await handleError(e.message);
+		if (stepStr) {
+			// 说明有其他步骤要走
+			await execSteps(filePath, stepStr);
+			await pull(filePath);
+		}
 	}
 }
 
 async function push(filePath) {
-	const isClear = await gitUtil.isAllClear();
-	if (isClear) {
-		// 若暂存区工作区干净，则无需push
+	let tempClear = await gitUtil.isTempClear();
+	const workClear = await gitUtil.isWorkClear();
+	if (!workClear) {
+		const { isAdd } = await inquirer.prompt([{
+			type: 'confirm',
+			name: 'isAdd',
+			message: '工作区存在未add代码，是否add',
+		}]);
+		if (isAdd) {
+			await add(filePath);
+			tempClear = false;
+		}
+	}
+	if (!tempClear) {
+		const { isCommit } = await inquirer.prompt([{
+			type: 'confirm',
+			name: 'isCommit',
+			message: '暂存区存在未commit代码，是否commit',
+		}]);
+		if (isCommit) {
+			await commit(filePath);
+		}
+	}
+	const needPush = await gitUtil.isNeedPush(filePath);
+	if (!needPush) {
 		log.text("暂存区和工作区干净，跳过push。");
 		return;
 	}

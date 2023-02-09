@@ -24,7 +24,7 @@ const push = async (path) => await ExecCMD(path, `git push`, '已推送到远程
 const pushOrigin = async (path, branch = 'master') => await ExecCMD(path, `git push -u origin ${branch}`, `已推送${branch}分支到远程仓库`, `正在推送${branch}分支到远程仓库...`);
 const pushUpStream = async (path, branch = 'dev') => await ExecCMD(path, `git push --set-upstream origin ${branch}`, `已与远程${branch}分支建立连接并推送`, `正在与远程${branch}分支建立连接并推送...`);
 const checkRemote = async (path) => await ExecCMD(path, `git remote -v`, '');
-const pull = async (path) => await ExecCMD(path, 'git pull', '已从远程仓库拉取代码', '正在从远程仓库拉取代码...');
+const pull = async (path, ops) => await ExecCMD(path, `git pull ${ops}`, '已从远程仓库拉取代码', '正在从远程仓库拉取代码...');
 const checkout = async (path, branch = 'test') => await ExecCMD(path, `git checkout ${branch}`, `已切换${branch}分支`, `正在切换${branch}分支...`);
 const merge = async (path, branch = 'dev') => await ExecCMD(path, `git merge ${branch}`, `已与${branch}分支合并`, `正在与${branch}分支合并...`);
 const remoteSet = async (path, url) => await ExecCMD(path, `git remote origin set-url ${url}`, `已修改远程仓库地址`, `正在修改远程仓库地址...`);
