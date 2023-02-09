@@ -71,7 +71,6 @@ async function isWorkClear(filePath) {
 }
 async function isNeedPush(filePath) {
   const result = await execCMD.status(filePath);
-  console.log('result', result);
   if (~result.indexOf('use "git push" to publish your local commits')) {
     // 说明需要push
     return true;
