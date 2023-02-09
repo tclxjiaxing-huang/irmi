@@ -61,17 +61,34 @@ async function getCurrBranch(filePath) {
 }
 
 // 判断暂存区是否有修改
-async function isFileChange(filePath, type = 'temp') {
+async function isFileClear(filePath, type = 'temp') {
   const result = await execCMD.status(filePath);
-  if (type === 'temp' && ~result.indexOf('no changes added to commit')) {
+  const isTempClear = () => {
+    if (~result.indexOf('no changes added to commit')) {
+      // 说明暂存区是干净的
+      return false;
+    }
+  }
+  const isWorkClear = () => {
+    if(~result.indexOf('Changes not staged for commit')) {
+      // 说明工作区有文件待add
+    }
+  }
+  if (~result.indexOf('Changes to be committed')) {
+    // 说明暂存区有待commit文件
+    return true;
+  }
+  if(~result.indexOf('Changes not staged for commit')) {
+    // 说明工作区有文件待add
+  }
+  if (~result.indexOf('no changes added to commit')) {
     // 说明暂存区是干净的
     return false;
   }
-  if (type === 'work' && result.indexOf('nothing to commit, working tree clean')) {
-    // 说明工作区和暂存区都是干净的
+  if (result.indexOf('nothing to commit, working tree clean')) {
+    // 说明暂存区和工作区都是干净的
     return false;
   }
-  return true;
 }
 
 // 获取已存在的tag
