@@ -8,6 +8,7 @@ const allSteps = {
 	checkout,
 	add,
 	commit,
+	pull,
 	push,
 	branch,
 	branchTag,
@@ -189,6 +190,15 @@ async function commit(filePath) {
 	}
 }
 
+async function pull(filePath) {
+	try {
+		await execCMD.pull(filePath);
+		log.success("已从远程仓库更新!");
+	} catch (e) {
+		await handleError(e.message);
+	}
+}
+
 async function push(filePath) {
 	const isClear = await gitUtil.isAllClear();
 	if (isClear) {
@@ -200,7 +210,12 @@ async function push(filePath) {
 		await execCMD.push(filePath);
 		log.success("已推送到远程仓库!");
 	} catch (e) {
-		await handleError(e.message);
+		const stepStr = await handleError(e.message);
+		if (stepStr) {
+			// 说明有其他步骤要走
+			await execSteps(filePath, stepStr);
+			await push(filePath);
+		}
 	}
 }
 

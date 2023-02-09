@@ -48,6 +48,9 @@ program
 program
   .command('git')
   .description('内置常用git操作')
+  .option('-a --add','添加到暂存区')
+  .option('-c --commit','提交代码')
+  .option('-p --push','推送')
   .option('-b --branch','创建分支')
   .option('-bt --branchTag','从指定tag创建分支')
   .option('-t --tag','打标签')
@@ -55,7 +58,8 @@ program
   .option('-do --delOriginBranch','删除远程分支')
   .option('-dt --delTag','打标签')
   .option('-dto --delOriginTag','打标签')
-  .option('-c --checkout','切换分支')
+  .option('-pl --pull','拉取')
+  .option('-ck --checkout','切换分支')
   .option('-m --merge','合并分支')
   .action(async (options) => {
     await git(options);
