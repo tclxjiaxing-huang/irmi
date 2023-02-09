@@ -69,9 +69,13 @@ async function isWorkClear(filePath) {
   }
   return false;
 }
-async function isAllClear(filePath) {
-  const data = await Promise.all([isWorkClear(filePath), isTempClear(filePath)]);
-  return data.every((item) => item);
+async function isNeedPush(filePath) {
+  const result = await execCMD.status(filePath);
+  if (!~result.indexOf('use "git push" to publish your local commits')) {
+    // 说明需要push
+    return true;
+  }
+  return false;
 }
 
 // 获取已存在的tag
@@ -86,7 +90,7 @@ async function getAlreadyTag(filePath) {
 module.exports = {
   isTempClear,
   isWorkClear,
-  isAllClear,
+  isNeedPush,
   checkRemote,
   checkOriginBranch,
   getAllBranch,

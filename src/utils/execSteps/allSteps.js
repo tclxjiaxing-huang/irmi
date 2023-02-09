@@ -207,11 +207,6 @@ async function pull(filePath, rebase) {
 async function push(filePath) {
 	let tempClear = await gitUtil.isTempClear();
 	const workClear = await gitUtil.isWorkClear();
-	if (tempClear && workClear) {
-		// 若暂存区工作区干净，则无需push
-		log.text("暂存区和工作区干净，跳过push。");
-		return;
-	}
 	if (!workClear) {
 		const { isAdd } = await inquirer.prompt([{
 			type: 'confirm',
@@ -232,6 +227,11 @@ async function push(filePath) {
 		if (isCommit) {
 			await commit(filePath);
 		}
+	}
+	const needPush = await gitUtil.isNeedPush(filePath);
+	if (!needPush) {
+		log.text("暂存区和工作区干净，跳过push。");
+		return;
 	}
 	try {
 		await execCMD.push(filePath);
