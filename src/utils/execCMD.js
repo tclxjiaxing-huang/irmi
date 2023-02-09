@@ -10,7 +10,7 @@ const chalk = require("chalk");
 
 async function ExecCMD(path, execCode, afterTips = '', beforeTips = '') {
   return new Promise(async (resolve, reject) => {
-    beforeTips && await spinner.start(beforeTips);
+    // beforeTips && await spinner.start(beforeTips);
     exec(execCode, {
       cwd: path,
     }, async (err, stdout) => {
