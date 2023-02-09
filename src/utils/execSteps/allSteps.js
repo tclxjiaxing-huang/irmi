@@ -55,6 +55,10 @@ async function commit(filePath) {
 		type: 'input',
 		name: 'commitMsg',
 		message: '请输入提交描述',
+		validate: (value) => {
+			if (value.length === 0) return '描述内容不能为空'
+			return true;
+		},
 	}]);
 	try {
 		await execCMD.commit(filePath, commitMsg);

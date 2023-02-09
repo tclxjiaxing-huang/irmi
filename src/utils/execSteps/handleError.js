@@ -19,6 +19,9 @@ const errMsgMap = [
 		msg: "Please commit your changes or stash them before you switch branches.",
 		desc: "当前分支有修改文件，切换分支前，先提交本地改变。",
 		handleFunction: changeBeforeSwitch,
+	},
+	{
+		msg: "Aborting commit due to empty commit message.",
 	}
 ];
 async function handleError(errMsg, ...args) {
