@@ -1,6 +1,6 @@
 const {
   execCMD,
-} = require('./CMD');
+} = require('./execCMD');
 const abnormal = require('./abnormal');
 
 // 获取所有分支

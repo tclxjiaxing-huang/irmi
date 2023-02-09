@@ -3,7 +3,7 @@
 const { Command } = require('commander');
 const tag = require('../src/command/tag/tag.js');
 const push = require('../src/command/push/push.js');
-const saveFile = require('../src/command/config/saveFilesPath');
+const config = require('../src/command/config/config');
 const {
   showProject,
   delProject,
@@ -28,16 +28,18 @@ program.version('1.1.1');
 
 program
   .command('config <filePath>')
+  .option('-d, --del', '删除项目')
   .description('配置项目文件路径(多个项目逗号隔开)')
-  .action((filePath) => {
-    saveFile(filePath);
+  .action((filePath, options) => {
+    config(filePath, options);
   })
 
 program
   .command('push')
+  .option('-c, --choose [projectName]', 'choose project by yourself')
   .description('代码提交相关')
-  .action(() => {
-    push();
+  .action((options) => {
+    push(options);
   });
 
 program
@@ -68,4 +70,4 @@ program
     await customStep();
   });
 
-program.parse(process.argv);
+program.parse();

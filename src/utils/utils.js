@@ -1,7 +1,7 @@
 const files = require('./files');
 const date = require('./date');
 const log = require('./log');
-const CMD = require('./CMD');
+const CMD = require('./execCMD');
 [
   files,
   date,

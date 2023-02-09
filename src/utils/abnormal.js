@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const {
   execCMD,
-} = require('./CMD');
+} = require('./execCMD');
 const {
   red,
 } = require('./log')
