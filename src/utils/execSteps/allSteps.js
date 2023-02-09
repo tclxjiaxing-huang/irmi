@@ -68,6 +68,11 @@ async function branch(filePath, branchName, tagName) {
 }
 
 async function add(filePath) {
+	const isClear = await gitUtil.isWorkClear();
+	if (isClear) {
+		// 若工作区区干净，则无需add
+		return;
+	}
 	try {
 		await execCMD.add(filePath);
 		log.success('已添加到暂存区！');
@@ -77,11 +82,10 @@ async function add(filePath) {
 }
 
 async function commit(filePath) {
-	try {
-		const res = await execCMD.status(filePath);
-		log.success(res);
-	} catch (e) {
-		log.red(e);
+	const isClear = await gitUtil.isTempClear();
+	if (isClear) {
+		// 若暂存区干净，则无需commit
+		return;
 	}
 	// 输入描述
 	const { commitMsg } = await inquirer.prompt([{
