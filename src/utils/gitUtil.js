@@ -69,6 +69,14 @@ async function isWorkClear(filePath) {
   }
   return false;
 }
+async function isAllClear(filePath) {
+  const result = await execCMD.status(filePath);
+  if (!~result.indexOf('nothing to commit, working tree clean')) {
+    // 说明工作区和暂存区干净
+    return true;
+  }
+  return false;
+}
 
 // 获取已存在的tag
 async function getAlreadyTag(filePath) {
@@ -82,6 +90,7 @@ async function getAlreadyTag(filePath) {
 module.exports = {
   isTempClear,
   isWorkClear,
+  isAllClear,
   checkRemote,
   checkOriginBranch,
   getAllBranch,
