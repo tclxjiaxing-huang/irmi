@@ -19,6 +19,7 @@ const allSteps = {
 	delTag,
 	delOriginTag,
 	merge,
+	pushUpStream,
 }
 async function checkout (filePath, branchName) {
 	const allLocalBranchs = await gitUtil.getAllBranch(filePath);
@@ -244,6 +245,20 @@ async function push(filePath) {
 			// 说明有其他步骤要走
 			await execSteps(filePath, stepStr);
 			await push(filePath);
+		}
+	}
+}
+
+async function pushUpStream(filePath) {
+	try {
+		await execCMD.pushUpStream(filePath, branch);
+		log.success("已创建远程分支!");
+	} catch (e) {
+		const stepStr = await handleError(e.message);
+		if (stepStr) {
+			// 说明有其他步骤要走
+			await execSteps(filePath, stepStr);
+			await pushUpStream(filePath);
 		}
 	}
 }
