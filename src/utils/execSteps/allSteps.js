@@ -5,6 +5,7 @@ const handleError = require('./handleError');
 const log = require("../log");
 
 const allSteps = {
+	init,
 	checkout,
 	add,
 	commit,
@@ -21,6 +22,12 @@ const allSteps = {
 	merge,
 	pushUpStream,
 }
+
+async function init(filePath) {
+	await execCMD.init(filePath);
+	log.success('git初始化成功');
+}
+
 async function checkout (filePath, branchName) {
 	const allLocalBranchs = await gitUtil.getAllBranch(filePath);
 	if (!branchName) {
@@ -49,18 +56,8 @@ async function checkout (filePath, branchName) {
 			await allSteps.branch(filePath, branchName);
 		}
 	}
-	try {
-		await execCMD.checkout(filePath, branchName);
-		log.success(`已切换到${branchName}分支`);
-	} catch (e) {
-		const stepStr = await handleError(e.message);
-		if (stepStr) {
-			// 说明有其他步骤要走
-			await execSteps(filePath, stepStr);
-			// 完成后再次执行当前函数
-			await checkout(filePath, branchName);
-		}
-	}
+	await execCMD.checkout(filePath, branchName);
+	log.success(`已切换到${branchName}分支`);
 };
 
 async function branch(filePath, branchName, tagName) {
@@ -78,15 +75,11 @@ async function branch(filePath, branchName, tagName) {
 		log.error(`已存在名称为${branchName}的分支`);
 		return;
 	}
-	try {
-		await execCMD.branch(filePath, branchName, tagName);
-		if (tagName) {
-			log.success(`已从tag${tagName}中创建${branchName}新分支!`);
-		} else {
-			log.success(`创建${branchName}分支成功!`);
-		}
-	} catch (e) {
-		await handleError(e.message);
+	await execCMD.branch(filePath, branchName, tagName);
+	if (tagName) {
+		log.success(`已从tag${tagName}中创建${branchName}新分支!`);
+	} else {
+		log.success(`创建${branchName}分支成功!`);
 	}
 }
 
@@ -117,16 +110,12 @@ async function delBranch(filePath, branchName) {
 		}]);
 		branch = res.branch;
 	}
-	try {
-		if (!allLocalBranchs.includes(branchName)) {
-			log.error(`${branchName}分支不存在，跳过当前步骤!`);
-			return;
-		}
-		await execCMD.delBranch(filePath, branchName);
-		log.success(`删除${branchName}分支成功!`);
-	} catch (e) {
-		await handleError(e.message);
+	if (!allLocalBranchs.includes(branchName)) {
+		log.error(`${branchName}分支不存在，跳过当前步骤!`);
+		return;
 	}
+	await execCMD.delBranch(filePath, branchName);
+	log.success(`删除${branchName}分支成功!`);
 }
 
 async function delOriginBranch(filePath, branchName) {
@@ -139,12 +128,8 @@ async function delOriginBranch(filePath, branchName) {
 		}]);
 		branchName = newBranch;
 	}
-	try {
-		await execCMD.delOriginBranch(filePath, branchName);
-		log.success(`删除远程${branchName}分支成功!`);
-	} catch (e) {
-		await handleError(e.message);
-	}
+	await execCMD.delOriginBranch(filePath, branchName);
+	log.success(`删除远程${branchName}分支成功!`);
 }
 
 async function add(filePath) {
@@ -154,12 +139,8 @@ async function add(filePath) {
 		log.text("工作区干净，跳过add。");
 		return;
 	}
-	try {
-		await execCMD.add(filePath);
-		log.success('已添加到暂存区！');
-	} catch (e) {
-		await handleError(e.message);
-	}
+	await execCMD.add(filePath);
+	log.success('已添加到暂存区！');
 }
 
 async function commit(filePath) {
@@ -179,32 +160,13 @@ async function commit(filePath) {
 			return true;
 		},
 	}]);
-	try {
-		await execCMD.commit(filePath, commitMsg);
-		log.success('已提交！');
-	} catch (e) {
-		const stepStr = await handleError(e.message);
-		if (stepStr) {
-			// 说明有其他步骤要走
-			await execSteps(filePath, stepStr);
-			// 完成后再次执行当前函数
-			await commit(filePath);
-		}
-	}
+	await execCMD.commit(filePath, commitMsg);
+	log.success('已提交！');
 }
 
 async function pull(filePath, rebase) {
-	try {
-		await execCMD.pull(filePath, rebase ? '--rebase' : '');
-		log.success("已从远程仓库更新!");
-	} catch (e) {
-		const stepStr = await handleError(e.message);
-		if (stepStr) {
-			// 说明有其他步骤要走
-			await execSteps(filePath, stepStr);
-			await pull(filePath);
-		}
-	}
+	await execCMD.pull(filePath, rebase ? '--rebase' : '');
+	log.success("已从远程仓库更新!");
 }
 
 async function push(filePath) {
@@ -233,7 +195,6 @@ async function push(filePath) {
 	}
 	const nowBranch = await gitUtil.getCurrBranch(filePath);
 	const existBranch = await gitUtil.checkOriginBranch(filePath, nowBranch);
-	console.log('existBranch', existBranch);
 	if (existBranch) {
 		const needPush = await gitUtil.isNeedPush(filePath);
 		if (!needPush) {
@@ -251,45 +212,18 @@ async function push(filePath) {
 			await pushUpStream(filePath, nowBranch);
 		}
 	}
-	try {
-		await execCMD.push(filePath);
-		log.success("已推送到远程仓库!");
-	} catch (e) {
-		const stepStr = await handleError(e.message);
-		if (stepStr) {
-			// 说明有其他步骤要走
-			await execSteps(filePath, stepStr);
-			await push(filePath);
-		}
-	}
+	await execCMD.push(filePath);
+	log.success("已推送到远程仓库!");
 }
 
 async function pushUpStream(filePath, branch) {
-	try {
-		await execCMD.pushUpStream(filePath, branch);
-		log.success("已创建远程分支!");
-	} catch (e) {
-		const stepStr = await handleError(e.message);
-		if (stepStr) {
-			// 说明有其他步骤要走
-			await execSteps(filePath, stepStr);
-			await pushUpStream(filePath);
-		}
-	}
+	await execCMD.pushUpStream(filePath, branch);
+	log.success("已创建远程分支!");
 }
 
 async function pushTag(filePath) {
-	try {
-		await execCMD.pushTag(filePath);
-		log.success("已推送标签到远程仓库!");
-	} catch (e) {
-		const stepStr = await handleError(e.message);
-		if (stepStr) {
-			// 说明有其他步骤要走
-			await execSteps(filePath, stepStr);
-			await pushTag(filePath);
-		}
-	}
+	await execCMD.pushTag(filePath);
+	log.success("已推送标签到远程仓库!");
 }
 
 async function merge(filePath, branch) {
@@ -310,18 +244,8 @@ async function merge(filePath, branch) {
 		log.error('没有目标分支，跳过当前步骤。');
 		return;
 	}
-	try {
-		await execCMD.merge(filePath, branch);
-		log.success(`已将${branch}分支合并到当前分支(${nowBranch})`);
-	} catch (e) {
-		const stepStr = await handleError(e.message);
-		if (stepStr) {
-			// 说明有其他步骤要走
-			await execSteps(filePath, stepStr);
-			// 完成后再次执行当前函数
-			await merge(filePath, branch);
-		}
-	}
+	await execCMD.merge(filePath, branch);
+	log.success(`已将${branch}分支合并到当前分支(${nowBranch})`);
 }
 
 async function tag(filePath, tagName, tagDesc) {
@@ -347,17 +271,8 @@ async function tag(filePath, tagName, tagDesc) {
 		}]);
 		tagDesc = newTagDesc;
 	}
-	try {
-		await execCMD.tag(filePath, tagName, tagDesc);
-		log.success(`添加${tagName}标签成功!`);
-	} catch (e) {
-		const stepStr = await handleError(e.message);
-		if (stepStr) {
-			// 说明有其他步骤要走
-			await execSteps(filePath, stepStr);
-			await tag(filePath);
-		}
-	}
+	await execCMD.tag(filePath, tagName, tagDesc);
+	log.success(`添加${tagName}标签成功!`);
 }
 
 async function delTag(filePath, tagName) {
@@ -376,17 +291,8 @@ async function delTag(filePath, tagName) {
 		}]);
 		tagName = newTag;
 	}
-	try {
-		await execCMD.delTag(filePath, tagName);
-		log.success(`删除${tagName}标签成功!`);
-	} catch (e) {
-		const stepStr = await handleError(e.message);
-		if (stepStr) {
-			// 说明有其他步骤要走
-			await execSteps(filePath, stepStr);
-			await delTag(filePath);
-		}
-	}
+	await execCMD.delTag(filePath, tagName);
+	log.success(`删除${tagName}标签成功!`);
 }
 
 async function delOriginTag(filePath, tagName) {
@@ -399,17 +305,8 @@ async function delOriginTag(filePath, tagName) {
 		}]);
 		tagName = newTag;
 	}
-	try {
-		await execCMD.delOriginTag(filePath, tagName);
-		log.success(`删除远程${tagName}标签成功!`);
-	} catch (e) {
-		const stepStr = await handleError(e.message);
-		if (stepStr) {
-			// 说明有其他步骤要走
-			await execSteps(filePath, stepStr);
-			await delOriginTag(filePath);
-		}
-	}
+	await execCMD.delOriginTag(filePath, tagName);
+	log.success(`删除远程${tagName}标签成功!`);
 }
 
 async function execSteps(filePath, stepStr) {
@@ -421,7 +318,16 @@ async function execSteps(filePath, stepStr) {
 			let [, stepName, args] = step.match(matchName);
 			args = args ? args.split(',') : [];
 			if (allSteps[stepName] instanceof Function) {
-				await allSteps[stepName](filePath, ...args);
+				try {
+					await allSteps[stepName](filePath, ...args);
+				} catch(e) {
+					const stepStr = await handleError(e.message);
+					if (stepStr) {
+						// 说明有其他步骤要走
+						await execSteps(filePath, stepStr);
+						await allSteps[stepName](filePath, ...args);
+					}
+				}
 			}
 		}
 	}

@@ -66,7 +66,24 @@ async function notExistUpstreamBranch() {
 	process.exit(0);
 }
 
+async function gitInit() {
+	const { isInit } = await inquirer.prompt([{
+		type: 'confirm',
+		name: 'isInit',
+		message: '是否进行git初始化',
+	}]);
+	if (isInit) {
+		return "init";
+	}
+	process.exit(0);
+}
+
 const errMsgMap = [
+	{
+		msg: "fatal: not a git repository",
+		desc: "当前项目还未git初始化",
+		handleFunction: gitInit,
+	},
 	{
 		msg: "Please commit your changes or stash them before you switch branches.",
 		desc: "当前分支有修改文件，切换分支前，先提交本地改变。",
