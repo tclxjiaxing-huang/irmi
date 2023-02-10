@@ -66,6 +66,10 @@ async function notExistUpstreamBranch() {
 	process.exit(0);
 }
 
+function processExit() {
+	process.exit(0);
+}
+
 async function gitInit() {
 	const { isInit } = await inquirer.prompt([{
 		type: 'confirm',
@@ -132,6 +136,11 @@ const errMsgMap = [
 		msg: "fatal: The current branch test has no upstream branch",
 		desc: "当前分支不存在远程分支",
 		handleError: notExistUpstreamBranch
+	},
+	{
+		msg: "command not found",
+		desc: "git命令未找到，请先安装git",
+		handleError: processExit,
 	}
 ];
 async function handleError(errMsg, ...args) {
