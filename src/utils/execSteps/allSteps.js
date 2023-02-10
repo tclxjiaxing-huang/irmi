@@ -282,7 +282,7 @@ async function delTag(filePath, tagName) {
 		const { newTag } = await inquirer.prompt([{
 			type: 'list',
 			name: 'newTag',
-			message: '请选择要删除的标签',
+			message: '请选择要删除的标签。',
 			validate: (value) => {
 				if (value.length === 0) return '需至少选择一个标签';
 				return true;
