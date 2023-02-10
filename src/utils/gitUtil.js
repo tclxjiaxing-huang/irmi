@@ -88,13 +88,13 @@ async function getAlreadyTag(filePath) {
 }
 
 module.exports = {
+  isNeedPush,
+  executeCMD,
   isTempClear,
   isWorkClear,
-  isNeedPush,
   checkRemote,
-  checkOriginBranch,
   getAllBranch,
   getCurrBranch,
-  executeCMD,
   getAlreadyTag,
+  checkOriginBranch,
 }

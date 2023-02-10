@@ -81,37 +81,16 @@ const resolve = (...args) => {
   return path.resolve(...args);
 }
 
-// 解析项目文件名
-const readFilesPath = () => {
-  const fileData = getProjectData();
-  if (fileData.length === 0) {
-    yellow('暂无项目，请先添加');
-    process.exit(0);
-  }
-  return fileData.map((file) => {
-    let name = file.name;
-    if (name.indexOf(':') !== -1) {
-      name = name.split('\\')[name.split('\\').length - 1];
-    }
-    name = name.split('\/')[name.split('\/').length - 1];
-    return {
-      path: file.path,
-      name: name,
-    };
-  });
-}
-
 module.exports = {
   irmiDirName,
-  isFileExist,
-  createFile,
-  writeFile,
-  readFile,
-  resolve,
-  readFilesPath,
-  writeDataToHomeDir,
-  getProjectData,
-  getStepData,
-  projectFileName,
   stepFileName,
+  projectFileName,
+  resolve,
+  readFile,
+  writeFile,
+  createFile,
+  isFileExist,
+  getStepData,
+  getProjectData,
+  writeDataToHomeDir,
 }

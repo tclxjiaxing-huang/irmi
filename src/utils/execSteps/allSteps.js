@@ -5,22 +5,22 @@ const handleError = require('./handleError');
 const log = require("../log");
 
 const allSteps = {
-	init,
-	checkout,
+	tag,
 	add,
-	commit,
 	pull,
 	push,
-	pushTag,
-	branch,
-	branchTag,
-	tag,
-	delBranch,
-	delOriginBranch,
-	delTag,
-	delOriginTag,
+	init,
 	merge,
+	delTag,
+	branch,
+	commit,
+	pushTag,
+	checkout,
+	branchTag,
+	delBranch,
+	delOriginTag,
 	pushUpStream,
+	delOriginBranch,
 }
 
 async function init(filePath) {
