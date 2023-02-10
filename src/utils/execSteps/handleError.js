@@ -102,6 +102,7 @@ const errMsgMap = [
 ];
 async function handleError(errMsg, ...args) {
 	const find = errMsgMap.find((item) => ~errMsg.indexOf(item.msg));
+	log.gray(errMsg);
 	if (find) {
 		find.desc && log.warning(find.desc);
 		if (find.handleFunction instanceof Function) {
