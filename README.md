@@ -1,5 +1,5 @@
-## irmi
-#### 一个简易的git项目管理库
+# irmi
+#### 一个git项目指令执行托管工具库
 
 ### 安装
 ```shell script
@@ -23,27 +23,44 @@ irmi config /Users/huangjiaxing/works/projects/irmi
 ````
 
 ## push
-执行指令步骤，通过`step`可自定义配置执行步骤。
-默认内置步骤为  
+执行指令步骤(通过`step`可自定义配置执行步骤)。  
+项目路径为当前执行目录，可以通过追加`-c`进行自行选择已配置的项目。
+````
+irmi push [options]
+````
+### options
+`-c`: 选择项目  
+
+默认存在的内置步骤为  
 ```
-切换到dev->提交代码->推送->合并到test->合并dev->推送->切换到dev()
-checkout<dev>-add-commit-push-checkout<test>-merge<dev>-push-checkout<dev>
+切换到dev->提交代码->推送->合并到test->合并dev->推送->切换到dev
 ```
 
 ## step
 新增或删除自定义步骤。
+````
+irmi step
+````
 
 ## show
 查看已经配置的项目
+````
+irmi show
+````
 
 ## del
 删除已经配置的项目
+````
+irmi del
+````
 
 ## git(v1.3.0)
-内置常用git操作 
+内置常用git操作。  
+项目路径为当前执行目录。
 ````
-irmi git -d
+irmi git [options]
 ````
+### options
 `-b`: 创建分支  
 `-bt`: 从指定tag创建分支  
 `-t`: 打标签  
