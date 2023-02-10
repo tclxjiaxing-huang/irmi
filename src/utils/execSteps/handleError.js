@@ -93,6 +93,11 @@ const errMsgMap = [
 		msg: "error: please commit or stash them.",
 		desc: "存在未提交到代码",
 		handleFunction: changeBeforeSwitch,
+	},
+	{
+		msg: "Command failed: git merge",
+		desc: "合并分支失败",
+		handleError: fixConflict,
 	}
 ];
 async function handleError(errMsg, ...args) {
