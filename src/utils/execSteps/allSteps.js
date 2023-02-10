@@ -10,6 +10,7 @@ const allSteps = {
 	commit,
 	pull,
 	push,
+	pushTag,
 	branch,
 	branchTag,
 	tag,
@@ -242,6 +243,20 @@ async function push(filePath) {
 			// 说明有其他步骤要走
 			await execSteps(filePath, stepStr);
 			await push(filePath);
+		}
+	}
+}
+
+async function pushTag(filePath) {
+	try {
+		await execCMD.pushTag(filePath);
+		log.success("已推送标签到远程仓库!");
+	} catch (e) {
+		const stepStr = await handleError(e.message);
+		if (stepStr) {
+			// 说明有其他步骤要走
+			await execSteps(filePath, stepStr);
+			await pushTag(filePath);
 		}
 	}
 }
