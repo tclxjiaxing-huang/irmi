@@ -81,9 +81,7 @@ async function isExistUpstreamBranch(filePath) {
   let result = '';
   try {
     result = await execCMD.push(filePath);
-    console.log('result', result);
   } catch(e) {
-    console.log(e);
     result = e.message;
   }
   console.log('result', result);

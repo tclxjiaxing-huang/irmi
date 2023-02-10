@@ -231,7 +231,9 @@ async function push(filePath) {
 			await commit(filePath);
 		}
 	}
-	const existBranch = await gitUtil.isExistUpstreamBranch(filePath);
+	const nowBranch = await gitUtil.getCurrBranch(filePath);
+	const existBranch = await gitUtil.checkOriginBranch(filePath, nowBranch);
+	console.log('existBranch', existBranch);
 	if (existBranch) {
 		const needPush = await gitUtil.isNeedPush(filePath);
 		if (!needPush) {
