@@ -231,10 +231,23 @@ async function push(filePath) {
 			await commit(filePath);
 		}
 	}
-	const needPush = await gitUtil.isNeedPush(filePath);
-	if (!needPush) {
-		log.text("暂存区和工作区干净，跳过push。");
-		return;
+	const existBranch = await gitUtil.isExistUpstreamBranch(filePath);
+	if (existBranch) {
+		const needPush = await gitUtil.isNeedPush(filePath);
+		if (!needPush) {
+			log.text("暂存区和工作区干净，跳过push。");
+			return;
+		}
+	} else {
+		const { isCreateUpstreamBranch } = await inquirer.prompt([{
+			type: 'confirm',
+			name: 'isCreateUpstreamBranch',
+			message: '远程分支不存在，是否创建对应的远程分支',
+		}]);
+		if (isCreateUpstreamBranch) {
+			const nowBranch = await gitUtil.getCurrBranch(filePath);
+			await pushUpStream(filePath, nowBranch);
+		}
 	}
 	try {
 		await execCMD.push(filePath);
@@ -249,7 +262,7 @@ async function push(filePath) {
 	}
 }
 
-async function pushUpStream(filePath) {
+async function pushUpStream(filePath, branch) {
 	try {
 		await execCMD.pushUpStream(filePath, branch);
 		log.success("已创建远程分支!");
