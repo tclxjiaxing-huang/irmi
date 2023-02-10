@@ -77,15 +77,6 @@ async function isNeedPush(filePath) {
   }
   return false;
 }
-async function isExistUpstreamBranch(filePath) {
-  const result = await execCMD.status(filePath);
-  console.log('result', result);
-  if (~result.indexOf('fatal: The current branch test has no upstream branch')) {
-    // 说明不存在远程分支
-    return false;
-  }
-  return true;
-}
 
 // 获取已存在的tag
 async function getAlreadyTag(filePath) {
@@ -106,5 +97,4 @@ module.exports = {
   getCurrBranch,
   executeCMD,
   getAlreadyTag,
-  isExistUpstreamBranch,
 }
