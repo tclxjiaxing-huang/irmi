@@ -17,6 +17,7 @@ const allSteps = {
 	delBranch,
 	delOriginBranch,
 	delTag,
+	delOriginTag,
 	merge,
 }
 async function checkout (filePath, branchName) {
@@ -318,8 +319,14 @@ async function tag(filePath, tagName, tagDesc) {
 	}
 	try {
 		await execCMD.tag(filePath, tagName, tagDesc);
+		log.success(`添加${tagName}标签成功!`);
 	} catch (e) {
-		await handleError(e.message);
+		const stepStr = await handleError(e.message);
+		if (stepStr) {
+			// 说明有其他步骤要走
+			await execSteps(filePath, stepStr);
+			await tag(filePath);
+		}
 	}
 }
 
@@ -341,9 +348,37 @@ async function delTag(filePath, tagName) {
 	}
 	try {
 		await execCMD.delTag(filePath, tagName);
-		log.success(`删除${tagName}成功!`);
+		log.success(`删除${tagName}标签成功!`);
 	} catch (e) {
-		await handleError(e.message);
+		const stepStr = await handleError(e.message);
+		if (stepStr) {
+			// 说明有其他步骤要走
+			await execSteps(filePath, stepStr);
+			await delTag(filePath);
+		}
+	}
+}
+
+async function delOriginTag(filePath, tagName) {
+	if (!tagName) {
+		// 若不存在，则需要输入标签名称
+		const { newTag } = await inquirer.prompt([{
+			type: 'input',
+			name: 'newTag',
+			message: '请输入远程标签名称',
+		}]);
+		tagName = newTag;
+	}
+	try {
+		await execCMD.delOriginTag(filePath, tagName);
+		log.success(`删除远程${tagName}标签成功!`);
+	} catch (e) {
+		const stepStr = await handleError(e.message);
+		if (stepStr) {
+			// 说明有其他步骤要走
+			await execSteps(filePath, stepStr);
+			await delOriginTag(filePath);
+		}
 	}
 }
 

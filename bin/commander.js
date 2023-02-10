@@ -20,7 +20,7 @@ const logo = `
 *****************************
 `;
 const program = new Command();
-program.version('1.3.0');
+program.version('1.3.2');
 
 program
   .command('config <filePath>')
