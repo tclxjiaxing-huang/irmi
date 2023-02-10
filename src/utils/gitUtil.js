@@ -79,6 +79,7 @@ async function isNeedPush(filePath) {
 }
 async function isExistUpstreamBranch(filePath) {
   const result = await execCMD.status(filePath);
+  console.log('result', result);
   if (~result.indexOf('fatal: The current branch test has no upstream branch')) {
     // 说明不存在远程分支
     return false;
