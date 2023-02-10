@@ -54,6 +54,18 @@ async function pullFail() {
 	return 'pull<rebase>';
 }
 
+async function notExistUpstreamBranch() {
+	const { isCreateUpstreamBranch } = await inquirer.prompt([{
+		type: 'confirm',
+		name: 'isCreateUpstreamBranch',
+		message: '是否创建对应的远程分支',
+	}]);
+	if (isCreateUpstreamBranch) {
+		return "pushUpStream";
+	}
+	process.exit(0);
+}
+
 const errMsgMap = [
 	{
 		msg: "Please commit your changes or stash them before you switch branches.",
@@ -98,6 +110,11 @@ const errMsgMap = [
 		msg: "Command failed: git merge",
 		desc: "合并分支失败",
 		handleError: fixConflict,
+	},
+	{
+		msg: "fatal: The current branch test has no upstream branch",
+		desc: "当前分支不存在远程分支",
+		handleError: notExistUpstreamBranch
 	}
 ];
 async function handleError(errMsg, ...args) {
