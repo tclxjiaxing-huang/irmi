@@ -55,25 +55,25 @@ async function getCurrBranch(filePath) {
 
 async function isTempClear(filePath) {
   const result = await execCMD.status(filePath);
-  if (!~result.indexOf('Changes to be committed')) {
-    // 说明暂存区是干净的
-    return true;
+  if (~result.indexOf('Changes to be committed')) {
+    // 存在则说明暂存区存在更改
+    return false;
   }
-  return false;
+  return true;
 }
 async function isWorkClear(filePath) {
   const result = await execCMD.status(filePath);
-  if (!~result.indexOf('Changes not staged for commit') && !isHasUntracked(filePath)) {
-    // 说明工作区干净
-    return true;
+  if (~result.indexOf('Changes not staged for commit') || isHasUntracked(filePath)) {
+    // 存在说明工作区存在更改
+    return false;
   }
-  return false;
+  return true;
 }
 
 // 是否有新文件添加
 async function isHasUntracked(filePath) {
   const result = await execCMD.status(filePath);
-  if (!~result.indexOf('Untracked files:')) {
+  if (~result.indexOf('Untracked files:')) {
     return true;
   }
   return false;
