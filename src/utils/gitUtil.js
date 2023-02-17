@@ -64,7 +64,7 @@ async function isTempClear(filePath) {
 async function isWorkClear(filePath) {
   const result = await execCMD.status(filePath);
   console.log(!!~result.indexOf('Changes not staged for commit'));
-  if (~result.indexOf('Changes not staged for commit') || isHasUntracked(filePath)) {
+  if (~result.indexOf('Changes not staged for commit') || await isHasUntracked(filePath)) {
     // 存在说明工作区存在更改
     return false;
   }
