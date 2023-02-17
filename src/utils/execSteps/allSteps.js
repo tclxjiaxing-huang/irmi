@@ -316,6 +316,7 @@ async function execSteps(filePath, stepStr) {
 		const step = steps[i];
 		if (matchName.test(step)) {
 			let [, stepName, args] = step.match(matchName);
+			
 			args = args ? args.split(',') : [];
 			if (allSteps[stepName] instanceof Function) {
 				try {
