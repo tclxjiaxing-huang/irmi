@@ -133,7 +133,7 @@ async function delOriginBranch(filePath, branchName) {
 }
 
 async function add(filePath) {
-	const isClear = await gitUtil.isWorkClear();
+	const isClear = await gitUtil.isWorkClear(filePath);
 	if (isClear) {
 		// 若工作区干净，则无需add
 		log.text("工作区干净，跳过add。");
@@ -144,7 +144,7 @@ async function add(filePath) {
 }
 
 async function commit(filePath) {
-	const isClear = await gitUtil.isTempClear();
+	const isClear = await gitUtil.isTempClear(filePath);
 	if (isClear) {
 		// 若暂存区干净，则无需commit
 		log.text("暂存区干净，跳过commit。");
@@ -170,8 +170,8 @@ async function pull(filePath, rebase) {
 }
 
 async function push(filePath) {
-	let tempClear = await gitUtil.isTempClear();
-	const workClear = await gitUtil.isWorkClear();
+	let tempClear = await gitUtil.isTempClear(filePath);
+	const workClear = await gitUtil.isWorkClear(filePath);
 	if (!workClear) {
 		const { isAdd } = await inquirer.prompt([{
 			type: 'confirm',
