@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 const { Command } = require('commander');
-const push = require('../src/command/push/push.js');
-const config = require('../src/command/config/config');
+const push = require('../src/command/push');
+const config = require('../src/command/config');
 const {
   showProject,
   delProject,
-} = require('../src/command/projects/project');
-const customStep = require('../src/command/customStep/customStep');
+} = require('../src/command/projects');
+const customStep = require('../src/command/customStep');
 const git = require('../src/command/git');
 
 const logo = `
@@ -20,7 +20,7 @@ const logo = `
 *****************************
 `;
 const program = new Command();
-program.version('1.3.0');
+program.version('1.3.2');
 
 program
   .command('config <filePath>')

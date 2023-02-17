@@ -54,7 +54,40 @@ async function pullFail() {
 	return 'pull<rebase>';
 }
 
+async function notExistUpstreamBranch() {
+	const { isCreateUpstreamBranch } = await inquirer.prompt([{
+		type: 'confirm',
+		name: 'isCreateUpstreamBranch',
+		message: '是否创建对应的远程分支',
+	}]);
+	if (isCreateUpstreamBranch) {
+		return "pushUpStream";
+	}
+	process.exit(0);
+}
+
+function processExit() {
+	process.exit(0);
+}
+
+async function gitInit() {
+	const { isInit } = await inquirer.prompt([{
+		type: 'confirm',
+		name: 'isInit',
+		message: '是否进行git初始化',
+	}]);
+	if (isInit) {
+		return "init";
+	}
+	process.exit(0);
+}
+
 const errMsgMap = [
+	{
+		msg: "fatal: not a git repository",
+		desc: "当前项目还未git初始化",
+		handleFunction: gitInit,
+	},
 	{
 		msg: "Please commit your changes or stash them before you switch branches.",
 		desc: "当前分支有修改文件，切换分支前，先提交本地改变。",
@@ -98,6 +131,16 @@ const errMsgMap = [
 		msg: "Command failed: git merge",
 		desc: "合并分支失败",
 		handleError: fixConflict,
+	},
+	{
+		msg: "fatal: The current branch test has no upstream branch",
+		desc: "当前分支不存在远程分支",
+		handleError: notExistUpstreamBranch
+	},
+	{
+		msg: "command not found",
+		desc: "git命令未找到，请先安装git",
+		handleError: processExit,
 	}
 ];
 async function handleError(errMsg, ...args) {

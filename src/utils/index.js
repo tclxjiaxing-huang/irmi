@@ -1,5 +1,4 @@
 const log = require('./log');
-const date = require('./date');
 const files = require('./files');
 const execCMD = require('./execCMD');
 const allSteps = require('./execSteps');
