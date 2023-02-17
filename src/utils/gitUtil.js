@@ -63,8 +63,17 @@ async function isTempClear(filePath) {
 }
 async function isWorkClear(filePath) {
   const result = await execCMD.status(filePath);
-  if (!~result.indexOf('Changes not staged for commit')) {
+  if (!~result.indexOf('Changes not staged for commit') && !isHasUntracked(filePath)) {
     // 说明工作区干净
+    return true;
+  }
+  return false;
+}
+
+// 是否有新文件添加
+async function isHasUntracked(filePath) {
+  const result = await execCMD.status(filePath);
+  if (!~result.indexOf('Untracked files:')) {
     return true;
   }
   return false;

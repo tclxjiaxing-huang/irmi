@@ -5,8 +5,7 @@
   "main": "index.js",
   "type": "commonjs",
   "bin": {
-    "irmi": "bin/commander.js",
-    "irmiDev": "bin/commander.js"
+    "irmi": "bin/commander.js"
   },
   "dependencies": {
     "chalk": "^4.1.2",
